@@ -11,10 +11,45 @@ import { User } from './entity/User';
 import { createAccessToken, createRefreshToken } from './auth';
 import { sendRefreshToken } from './sendRefreshToken';
 import cors from 'cors';
+import session from 'express-session';
+import redis from 'redis';
+import connectRedis from 'connect-redis';
+
+// this delares a userId field in the session
+declare module 'express-session' {
+	interface Session {
+		userId: any;
+	}
+}
 
 (async () => {
 	const app = express();
 	app.use(cookieParser());
+
+	// redis store session
+	const RedisStore = connectRedis(session);
+	const redisClient = redis.createClient();
+
+	app.set('trust proxy', 1);
+	app.use(
+		session({
+			name: 'qid',
+			store: new RedisStore({
+				client: redisClient,
+				disableTTL: true,
+				disableTouch: true,
+			}),
+			cookie: {
+				maxAge: 1000 * 60 * 60 * 24,
+				httpOnly: true,
+				sameSite: 'none',
+				secure: false, // works for both http and https, need to change on prod
+			},
+			secret: process.env.SESSION_SECRET!,
+			resave: false,
+			saveUninitialized: false,
+		})
+	);
 
 	// cors
 	var whitelist = ['http://localhost:3000', 'https://studio.apollographql.com'];
@@ -63,6 +98,7 @@ import cors from 'cors';
 		}),
 		context: ({ req, res }) => ({ req, res }),
 	});
+
 	await apolloServer.start();
 	apolloServer.applyMiddleware({ app, cors: false });
 

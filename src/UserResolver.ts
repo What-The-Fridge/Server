@@ -30,10 +30,23 @@ export class UserResolver {
 	}
 
 	@Query(() => String)
-	@UseMiddleware(isAuth)
-	bye(@Ctx() { payload }: MyContext) {
-		console.log(payload);
+	bye(@Ctx() { req, payload }: MyContext) {
+		console.log(req.session);
+		if (!req.session.userId) {
+			return 'hi there';
+		}
 		return `your user id is: ${payload!.userId}`;
+	}
+
+	@Query(() => String)
+	@UseMiddleware(isAuth)
+	async me(@Ctx() { req }: MyContext) {
+		console.log(req.session);
+		if (!req.session.userId) {
+			return null;
+		}
+		const user = await User.findOne({ id: req.session.userId });
+		return user;
 	}
 
 	@Query(() => [User])
@@ -54,7 +67,7 @@ export class UserResolver {
 	async login(
 		@Arg('email') email: string,
 		@Arg('password') password: string,
-		@Ctx() { res }: MyContext
+		@Ctx() { req, res }: MyContext
 	): Promise<LoginResponse> {
 		const user = await User.findOne({ where: { email } });
 
@@ -67,6 +80,9 @@ export class UserResolver {
 		if (!valid) {
 			throw new Error('bad password');
 		}
+
+		req.session.userId = user.email;
+		console.log(req.session);
 
 		// log in successfully
 		sendRefreshToken(res, createRefreshToken(user));
