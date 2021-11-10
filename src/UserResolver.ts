@@ -25,6 +25,7 @@ class LoginResponse {
 @Resolver()
 export class UserResolver {
 	@Query(() => String)
+	@UseMiddleware(isAuth)
 	hello() {
 		return 'hello!';
 	}
@@ -39,7 +40,6 @@ export class UserResolver {
 	}
 
 	@Query(() => String)
-	@UseMiddleware(isAuth)
 	async me(@Ctx() { req }: MyContext) {
 		console.log(req.session);
 		if (!req.session.userId) {

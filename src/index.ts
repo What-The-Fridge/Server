@@ -19,6 +19,8 @@ import connectRedis from 'connect-redis';
 declare module 'express-session' {
 	interface Session {
 		userId: any;
+		username: any;
+		password: any;
 	}
 }
 
@@ -26,11 +28,33 @@ declare module 'express-session' {
 	const app = express();
 	app.use(cookieParser());
 
+	// cors
+	var whitelist = ['http://localhost:3000', 'https://studio.apollographql.com'];
+	app.use(
+		cors({
+			origin: whitelist,
+			credentials: true,
+		})
+	);
+
+	// enable this if you run behind a proxy (e.g. nginx)
+	app.set('trust proxy', 1);
+
 	// redis store session
 	const RedisStore = connectRedis(session);
-	const redisClient = redis.createClient();
+	//Configure redis client
+	const redisClient = redis.createClient({
+		host: 'localhost',
+		port: 6379,
+	});
 
-	app.set('trust proxy', 1);
+	redisClient.on('error', function (err) {
+		console.log('Could not establish a connection with redis. ' + err);
+	});
+	redisClient.on('connect', function () {
+		console.log('Connected to redis successfully');
+	});
+
 	app.use(
 		session({
 			name: 'qid',
@@ -42,8 +66,8 @@ declare module 'express-session' {
 			cookie: {
 				maxAge: 1000 * 60 * 60 * 24,
 				httpOnly: true,
-				sameSite: 'none',
-				secure: false, // works for both http and https, need to change on prod
+				sameSite: 'lax',
+				secure: false, // works for both http and https, need to change on __PROD__
 			},
 			secret: process.env.SESSION_SECRET!,
 			resave: false,
@@ -51,16 +75,34 @@ declare module 'express-session' {
 		})
 	);
 
-	// cors
-	var whitelist = ['http://localhost:3000', 'https://studio.apollographql.com'];
-	app.use(
-		cors({
-			origin: whitelist,
-			credentials: true,
-		})
-	);
-
-	app.get('/', (_req, res) => res.send('hello'));
+	app.get('/', (req, res) => {
+		const sess = req.session;
+		if (sess.username && sess.password) {
+			if (sess.username) {
+				res.write(`<h1>Welcome ${sess.username} </h1><br>`);
+				res.write(`<h3>This is the Home page</h3>`);
+				res.end('<a href=' + '/logout' + '>Click here to log out</a >');
+			}
+		} else {
+			res.sendFile(__dirname + '/login.html');
+		}
+	});
+	app.post('/login', (req, res) => {
+		const sess = req.session;
+		const { username, password } = req.body;
+		sess.username = username;
+		sess.password = password;
+		// add username and password validation logic here if you want.If user is authenticated send the response as success
+		res.end('success');
+	});
+	app.get('/logout', (req, res) => {
+		req.session.destroy(err => {
+			if (err) {
+				return console.log(err);
+			}
+			res.redirect('/');
+		});
+	});
 
 	app.post('/refresh_token', async (req, res) => {
 		const token = req.cookies.jid;
