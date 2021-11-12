@@ -1,6 +1,6 @@
 import { verify } from 'jsonwebtoken';
 import { MiddlewareFn } from 'type-graphql';
-import { MyContext } from './MyContext';
+import { MyContext } from '../context/MyContext';
 
 // bearer 1325151
 export const isAuth: MiddlewareFn<MyContext> = ({ context }, next) => {

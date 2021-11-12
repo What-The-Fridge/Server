@@ -10,19 +10,41 @@ import {
 	UseMiddleware,
 } from 'type-graphql';
 import { hash, compare } from 'bcryptjs';
-import { User } from './entity/User';
-import { MyContext } from './MyContext';
-import { createAccessToken, createRefreshToken } from './auth';
-import { isAuth } from './isAuth';
-import { sendRefreshToken } from './sendRefreshToken';
+import { User } from '../entities/User';
+import { MyContext } from '../utils/context/MyContext';
+import {
+	createAccessToken,
+	createRefreshToken,
+} from '../utils/authentication/auth';
+import { isAuth } from '../utils/authentication/isAuth';
+import { sendRefreshToken } from '../utils/authentication/sendRefreshToken';
 import { getConnection } from 'typeorm';
+import { validateRegister } from '../utils/authentication/validateRegister';
+
+@ObjectType()
+class FieldError {
+	@Field()
+	field: string;
+	@Field()
+	message: string;
+}
+
 @ObjectType()
 class LoginResponse {
 	@Field()
 	accessToken: string;
 }
 
-@Resolver()
+@ObjectType()
+class UserResponse {
+	@Field(() => [FieldError], { nullable: true })
+	errors?: FieldError[];
+
+	@Field(() => User, { nullable: true })
+	user?: User;
+}
+
+@Resolver(User)
 export class UserResolver {
 	@Query(() => String)
 	@UseMiddleware(isAuth)
@@ -92,19 +114,56 @@ export class UserResolver {
 		};
 	}
 
-	@Mutation(() => Boolean)
+	@Mutation(() => UserResponse)
 	async register(
+		@Arg('username') username: string,
 		@Arg('email') email: string,
-		@Arg('password') password: string
-	) {
+		@Arg('password') password: string,
+		@Ctx() { req }: MyContext
+	): Promise<UserResponse> {
+		const errors = validateRegister(username, email, password);
+		if (errors) return { errors };
+
 		const hashedPassword = await hash(password, 12);
 
+		let user;
 		try {
-			await User.insert({ email, password: hashedPassword });
+			const result = await getConnection()
+				.createQueryBuilder()
+				.insert()
+				.into(User)
+				.values({
+					username: username,
+					email: email,
+					password: hashedPassword,
+				})
+				.returning('*')
+				.execute();
+			user = result.raw[0];
 		} catch (err) {
-			console.log(err);
-			return false;
+			if (err.code === '23505') {
+				return {
+					errors: [
+						{
+							field: 'username',
+							message: 'username already taken',
+						},
+					],
+				};
+			} else {
+				return {
+					errors: [
+						{
+							field: 'unknown',
+							message: err.detail,
+						},
+					],
+				};
+			}
 		}
-		return true;
+
+		// register successfully, create session for the current user
+		req.session.userId = user.id;
+		return { user };
 	}
 }
