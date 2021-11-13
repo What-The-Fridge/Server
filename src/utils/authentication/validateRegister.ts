@@ -1,3 +1,4 @@
+// TODO: add more errors
 export const validateRegister = (
 	username: string,
 	email: string,

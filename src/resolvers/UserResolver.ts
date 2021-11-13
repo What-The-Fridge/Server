@@ -9,17 +9,12 @@ import {
 	Resolver,
 	UseMiddleware,
 } from 'type-graphql';
-import { hash, compare } from 'bcryptjs';
 import { User } from '../entities/User';
 import { MyContext } from '../utils/context/MyContext';
-import {
-	createAccessToken,
-	createRefreshToken,
-} from '../utils/authentication/auth';
 import { isAuth } from '../utils/authentication/isAuth';
-import { sendRefreshToken } from '../utils/authentication/sendRefreshToken';
 import { getConnection } from 'typeorm';
 import { validateRegister } from '../utils/authentication/validateRegister';
+import argon2 from 'argon2';
 
 @ObjectType()
 class FieldError {
@@ -27,12 +22,6 @@ class FieldError {
 	field: string;
 	@Field()
 	message: string;
-}
-
-@ObjectType()
-class LoginResponse {
-	@Field()
-	accessToken: string;
 }
 
 @ObjectType()
@@ -54,7 +43,6 @@ export class UserResolver {
 
 	@Query(() => String)
 	bye(@Ctx() { req, payload }: MyContext) {
-		console.log(req.session);
 		if (!req.session.userId) {
 			return 'hi there';
 		}
@@ -63,7 +51,6 @@ export class UserResolver {
 
 	@Query(() => String)
 	async me(@Ctx() { req }: MyContext) {
-		console.log(req.session);
 		if (!req.session.userId) {
 			return null;
 		}
@@ -85,32 +72,49 @@ export class UserResolver {
 		return true;
 	}
 
-	@Mutation(() => LoginResponse)
+	@Mutation(() => UserResponse)
 	async login(
-		@Arg('email') email: string,
+		@Arg('usernameOrEmail') usernameOrEmail: string,
 		@Arg('password') password: string,
-		@Ctx() { req, res }: MyContext
-	): Promise<LoginResponse> {
-		const user = await User.findOne({ where: { email } });
+		@Ctx() { req }: MyContext
+	): Promise<UserResponse> {
+		const user = await User.findOne(
+			usernameOrEmail.includes('@')
+				? { where: { email: usernameOrEmail } }
+				: { where: { username: usernameOrEmail } }
+		);
 
 		if (!user) {
-			throw new Error('could not find user');
+			return {
+				errors: [
+					{
+						field: 'usernameOrEmail',
+						message: "username/email doesn't exist",
+					},
+				],
+			};
 		}
 
-		const valid = await compare(password, user.password);
+		const valid = await argon2.verify(user.password, password);
 
 		if (!valid) {
-			throw new Error('bad password');
+			return {
+				errors: [
+					{
+						field: 'password',
+						message: 'invalid password',
+					},
+				],
+			};
 		}
 
-		req.session.userId = user.email;
-		console.log(req.session);
+		// upon success
+		req.session.userId = user.id;
 
-		// log in successfully
-		sendRefreshToken(res, createRefreshToken(user));
+		// sendRefreshToken(res, createRefreshToken(user));
 
 		return {
-			accessToken: createAccessToken(user),
+			user,
 		};
 	}
 
@@ -124,7 +128,7 @@ export class UserResolver {
 		const errors = validateRegister(username, email, password);
 		if (errors) return { errors };
 
-		const hashedPassword = await hash(password, 12);
+		const hashedPassword = await argon2.hash(password);
 
 		let user;
 		try {
@@ -145,8 +149,11 @@ export class UserResolver {
 				return {
 					errors: [
 						{
-							field: 'username',
-							message: 'username already taken',
+							field: err.detail.substring(
+								err.detail.indexOf('(') + 1,
+								err.detail.indexOf(')')
+							),
+							message: 'already exists',
 						},
 					],
 				};
@@ -154,7 +161,7 @@ export class UserResolver {
 				return {
 					errors: [
 						{
-							field: 'unknown',
+							field: 'password',
 							message: err.detail,
 						},
 					],
