@@ -5,35 +5,39 @@ import {
 	BaseEntity,
 	CreateDateColumn,
 	UpdateDateColumn,
-	OneToMany,
+	ManyToOne,
 } from 'typeorm';
 import { ObjectType, Field } from 'type-graphql';
 import { Fridge } from './Fridge';
 
 @ObjectType()
-@Entity('users')
-export class User extends BaseEntity {
+@Entity('fridgeItems')
+export class FridgeItem extends BaseEntity {
 	@Field()
 	@PrimaryGeneratedColumn()
 	id!: number;
 
 	@Field()
-	@Column({ unique: true })
-	username!: string;
+	@Column()
+	name!: string;
 
 	@Field()
-	@Column({ unique: true })
-	email!: string;
+	@Column()
+	purchasedDate: Date;
 
-	@Column('text')
-	password!: string;
+	@Field()
+	@Column()
+	expiryDate: Date;
 
-	@Column('int', { default: 0 })
-	tokenVersion: number;
+	@Field()
+	@Column()
+	imgUrl: string; //optional
 
-	// 1 user can have access to many fridges
-	@OneToMany(() => Fridge, fridge => fridge.users)
-	fridges: Fridge[];
+	// Many fridge items can be in 1 fridge
+	// TODO: one to one?
+	@Field()
+	@ManyToOne(() => Fridge, fridge => fridge.fridgeItems)
+	fridge: Fridge;
 
 	@Field(() => String)
 	@CreateDateColumn()
