@@ -1,29 +1,69 @@
 import { Fridge } from '../entities/Fridge';
-// import { FridgeItem } from 'src/entities/FridgeItem';
-// import { MyContext } from 'src/utils/context/MyContext';
-import { Arg, Field, InputType, Mutation, Resolver } from 'type-graphql';
+import { User } from '../entities/User';
+import { Arg, Field, Mutation, ObjectType, Resolver } from 'type-graphql';
+import { getConnection } from 'typeorm';
+import { FieldError } from './UserResolver';
 
-@InputType()
-class FridgeInput {
-	@Field()
-	name: string;
+@ObjectType()
+class FridgeResponse {
+	@Field(() => [FieldError], { nullable: true })
+	errors?: FieldError[];
 
-	// @Field()
-	// creatorId: number;
-
-	// @Field()
-	// fridgeItems: FridgeItem[];
+	@Field(() => Fridge, { nullable: true })
+	fridge?: Fridge;
 }
 
 @Resolver(Fridge)
 export class FridgeResolver {
-	@Mutation(() => Fridge)
+	@Mutation(() => FridgeResponse)
 	async createFridge(
-		@Arg('input') input: FridgeInput
-		// @Ctx() { req }: MyContext
-	): Promise<Fridge> {
-		return Fridge.create({
-			...input,
-		}).save();
+		@Arg('name') name: string,
+		@Arg('creatorId') creatorId: number
+	): Promise<FridgeResponse> {
+		let fridge;
+		let users: User[] = [];
+		const user = await User.findOne(creatorId);
+
+		if (!user) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message: "can't find the creator",
+					},
+				],
+			};
+		}
+
+		users.push(user);
+
+		try {
+			const result = await getConnection()
+				.createQueryBuilder()
+				.insert()
+				.into(Fridge)
+				.values({
+					name: name,
+					creatorId: creatorId,
+					users: users,
+				})
+				.returning('*')
+				.execute();
+			fridge = result.raw[0];
+		} catch (err) {
+			return {
+				errors: [
+					{
+						field: err.detail.substring(
+							err.detail.indexOf('(') + 1,
+							err.detail.indexOf(')')
+						),
+						message: err.detail,
+					},
+				],
+			};
+		}
+
+		return { fridge };
 	}
 }

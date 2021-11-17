@@ -17,7 +17,7 @@ import { validateRegister } from '../utils/authentication/validateRegister';
 import argon2 from 'argon2';
 
 @ObjectType()
-class FieldError {
+export class FieldError {
 	@Field()
 	field: string;
 	@Field()

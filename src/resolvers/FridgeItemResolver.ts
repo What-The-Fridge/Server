@@ -3,7 +3,7 @@ import { FridgeItem } from '../entities/FridgeItem';
 import { Arg, Field, InputType, Mutation, Resolver } from 'type-graphql';
 
 @InputType()
-class FridgeInput {
+class FridgeItemInput {
 	@Field()
 	name: string;
 	// @Field()
@@ -13,8 +13,8 @@ class FridgeInput {
 @Resolver(FridgeItem)
 export class FridgeItemResolver {
 	@Mutation(() => FridgeItem)
-	async createFridge(
-		@Arg('input') input: FridgeInput
+	async createFridgeItem(
+		@Arg('input') input: FridgeItemInput
 		// @Ctx() { req }: MyContext
 	): Promise<FridgeItem> {
 		return FridgeItem.create({

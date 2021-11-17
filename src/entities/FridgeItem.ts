@@ -25,7 +25,7 @@ export class FridgeItem extends BaseEntity {
 
 	@Field()
 	@Column()
-	quantity!: number;
+	quantity: number;
 
 	@Field()
 	@Column()
