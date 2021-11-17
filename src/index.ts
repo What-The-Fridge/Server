@@ -17,6 +17,8 @@ import cors from 'cors';
 import session from 'express-session';
 import redis from 'redis';
 import connectRedis from 'connect-redis';
+import { FridgeResolver } from './resolvers/FridgeResolver';
+import { FridgeItemResolver } from './resolvers/FridgeItemResolver';
 
 // declare a userId field in the session
 declare module 'express-session' {
@@ -139,7 +141,7 @@ declare module 'express-session' {
 	await createConnection();
 	const apolloServer = new ApolloServer({
 		schema: await buildSchema({
-			resolvers: [UserResolver],
+			resolvers: [UserResolver, FridgeResolver, FridgeItemResolver],
 		}),
 		context: ({ req, res }) => ({ req, res }),
 	});

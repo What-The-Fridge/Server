@@ -6,9 +6,11 @@ import {
 	CreateDateColumn,
 	UpdateDateColumn,
 	ManyToOne,
+	// ManyToOne,
 } from 'typeorm';
 import { ObjectType, Field } from 'type-graphql';
 import { Fridge } from './Fridge';
+// import { Fridge } from './Fridge';
 
 @ObjectType()
 @Entity('fridgeItems')
@@ -20,6 +22,10 @@ export class FridgeItem extends BaseEntity {
 	@Field()
 	@Column()
 	name!: string;
+
+	@Field()
+	@Column()
+	quantity!: number;
 
 	@Field()
 	@Column()
@@ -35,7 +41,6 @@ export class FridgeItem extends BaseEntity {
 
 	// Many fridge items can be in 1 fridge
 	// TODO: one to one?
-	@Field()
 	@ManyToOne(() => Fridge, fridge => fridge.fridgeItems)
 	fridge: Fridge;
 

@@ -22,6 +22,10 @@ export class Fridge extends BaseEntity {
 	@Column()
 	name!: string;
 
+	@Field()
+	@Column()
+	creatorId: number;
+
 	// 1 fridge can be shared by many users
 	@OneToMany(() => User, user => user.fridges)
 	users!: User[]; // must have at least 1 user || to be deleted
