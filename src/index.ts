@@ -19,6 +19,7 @@ import redis from 'redis';
 import connectRedis from 'connect-redis';
 import { FridgeResolver } from './resolvers/FridgeResolver';
 import { FridgeItemResolver } from './resolvers/FridgeItemResolver';
+const { Client } = require('pg');
 
 // declare a userId field in the session
 declare module 'express-session' {
@@ -29,8 +30,24 @@ declare module 'express-session' {
 	}
 }
 
+export const client = new Client({
+	host: 'localhost',
+	user: 'postgres',
+	password: 'postgres',
+	database: 'what-the-fridge',
+});
+
 (async () => {
 	const app = express();
+
+	client.connect((err: any) => {
+		if (err) {
+			console.error('postgres connection error', err.stack);
+		} else {
+			console.log('connected to what-the-fridge postgres server');
+		}
+	});
+
 	app.use(cookieParser());
 
 	// cors

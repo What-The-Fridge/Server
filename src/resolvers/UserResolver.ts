@@ -15,6 +15,7 @@ import { isAuth } from '../utils/authentication/isAuth';
 import { getConnection } from 'typeorm';
 import { validateRegister } from '../utils/authentication/validateRegister';
 import argon2 from 'argon2';
+import { client } from '../index';
 
 @ObjectType()
 export class FieldError {
@@ -132,18 +133,12 @@ export class UserResolver {
 
 		let user;
 		try {
-			const result = await getConnection()
-				.createQueryBuilder()
-				.insert()
-				.into(User)
-				.values({
-					username: username,
-					email: email,
-					password: hashedPassword,
-				})
-				.returning('*')
-				.execute();
-			user = result.raw[0];
+			const result = await client.query(
+				'INSERT INTO users ("username", "email", "password") VALUES ($1, $2, $3) RETURNING *',
+				[name, email, hashedPassword]
+			);
+
+			user = result.rows[0];
 		} catch (err) {
 			if (err.code === '23505') {
 				return {

@@ -1,8 +1,9 @@
 import { Fridge } from '../entities/Fridge';
 import { User } from '../entities/User';
 import { Arg, Field, Mutation, ObjectType, Resolver } from 'type-graphql';
-import { getConnection } from 'typeorm';
+// import { getConnection } from 'typeorm';
 import { FieldError } from './UserResolver';
+import { client } from '../index';
 
 @ObjectType()
 class FridgeResponse {
@@ -38,19 +39,14 @@ export class FridgeResolver {
 		users.push(user);
 
 		try {
-			const result = await getConnection()
-				.createQueryBuilder()
-				.insert()
-				.into(Fridge)
-				.values({
-					name: name,
-					creatorId: creatorId,
-					users: users,
-				})
-				.returning('*')
-				.execute();
-			fridge = result.raw[0];
+			const result = await client.query(
+				'INSERT INTO fridges ("name", "creatorId") VALUES ($1, $2) RETURNING *',
+				[name, creatorId]
+			);
+
+			fridge = result.rows[0];
 		} catch (err) {
+			console.log(err);
 			return {
 				errors: [
 					{
