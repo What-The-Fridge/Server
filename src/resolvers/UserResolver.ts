@@ -135,7 +135,7 @@ export class UserResolver {
 		try {
 			const result = await client.query(
 				'INSERT INTO users ("username", "email", "password") VALUES ($1, $2, $3) RETURNING *',
-				[name, email, hashedPassword]
+				[username, email, hashedPassword]
 			);
 
 			user = result.rows[0];

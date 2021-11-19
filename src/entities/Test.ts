@@ -1,16 +1,10 @@
-import { GraphQLObjectType } from 'graphql';
-import { GraphQLString } from 'graphql';
+import { ObjectType, Field } from 'type-graphql';
 
-export const Test = new GraphQLObjectType({
-	name: 'Test',
-	fields: () => ({
-		id: { type: GraphQLString },
-		first_name: { type: GraphQLString },
-		last_name: { type: GraphQLString },
-	}),
-});
+@ObjectType()
+export class Test {
+	@Field()
+	id!: number;
 
-// Test._typeConfig = {
-// 	sqlTable: 'test',
-// 	uniqueKey: 'id',
-// };
+	@Field()
+	hachi!: string;
+}

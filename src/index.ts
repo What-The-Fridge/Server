@@ -19,6 +19,7 @@ import redis from 'redis';
 import connectRedis from 'connect-redis';
 import { FridgeResolver } from './resolvers/FridgeResolver';
 import { FridgeItemResolver } from './resolvers/FridgeItemResolver';
+import { TestResolver } from './resolvers/TestResolver';
 const { Client } = require('pg');
 
 // declare a userId field in the session
@@ -158,7 +159,12 @@ export const client = new Client({
 	await createConnection();
 	const apolloServer = new ApolloServer({
 		schema: await buildSchema({
-			resolvers: [UserResolver, FridgeResolver, FridgeItemResolver],
+			resolvers: [
+				UserResolver,
+				FridgeResolver,
+				FridgeItemResolver,
+				TestResolver,
+			],
 		}),
 		context: ({ req, res }) => ({ req, res }),
 	});
