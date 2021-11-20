@@ -6,14 +6,17 @@ import {
 	CreateDateColumn,
 	UpdateDateColumn,
 	OneToMany,
+	ManyToOne,
 } from 'typeorm';
 import { ObjectType, Field } from 'type-graphql';
-import { User } from './User';
 import { FridgeItem } from './FridgeItem';
+import { FUJoinTable } from './FUJoinTable';
+import { User } from './User';
 
 @ObjectType()
 @Entity('fridges')
 export class Fridge extends BaseEntity {
+	// ---------------- fields ----------------
 	@Field()
 	@PrimaryGeneratedColumn()
 	id!: number;
@@ -24,16 +27,19 @@ export class Fridge extends BaseEntity {
 
 	@Field()
 	@Column()
-	creatorId: number;
+	ownerId!: number;
 
-	// 1 fridge can be shared by many users
-	@OneToMany(() => User, user => user.fridges)
-	users!: User[]; // must have at least 1 user || to be deleted
+	// ---------------- relationship ----------------
+	@ManyToOne(() => User, user => user.fridges)
+	owner: User;
 
-	// 1 fridge can store many fridge items in it
+	@OneToMany(() => FUJoinTable, fuTable => fuTable.fridge)
+	fuTables: FUJoinTable[];
+
 	@OneToMany(() => FridgeItem, fridgeItem => fridgeItem.fridge)
 	fridgeItems: FridgeItem[];
 
+	// ---------------- time ----------------
 	@Field(() => String)
 	@CreateDateColumn()
 	createdAt: Date;

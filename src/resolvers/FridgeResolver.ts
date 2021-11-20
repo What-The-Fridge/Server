@@ -19,11 +19,10 @@ export class FridgeResolver {
 	@Mutation(() => FridgeResponse)
 	async createFridge(
 		@Arg('name') name: string,
-		@Arg('creatorId') creatorId: number
+		@Arg('ownerId') ownerId: number
 	): Promise<FridgeResponse> {
 		let fridge;
-		let users: User[] = [];
-		const user = await User.findOne(creatorId);
+		const user = await User.findOne(ownerId);
 
 		if (!user) {
 			return {
@@ -36,12 +35,10 @@ export class FridgeResolver {
 			};
 		}
 
-		users.push(user);
-
 		try {
 			const result = await client.query(
-				'INSERT INTO fridges ("name", "creatorId") VALUES ($1, $2) RETURNING *',
-				[name, creatorId]
+				'INSERT INTO fridges ("name", "ownerId") VALUES ($1, $2) RETURNING *',
+				[name, ownerId]
 			);
 
 			fridge = result.rows[0];

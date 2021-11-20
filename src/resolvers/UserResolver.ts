@@ -73,6 +73,7 @@ export class UserResolver {
 		return true;
 	}
 
+	// TODO: redo the /findOne with actual sql query aka avoid using typeorm for querying data
 	@Mutation(() => UserResponse)
 	async login(
 		@Arg('usernameOrEmail') usernameOrEmail: string,

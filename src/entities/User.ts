@@ -8,11 +8,13 @@ import {
 	OneToMany,
 } from 'typeorm';
 import { ObjectType, Field } from 'type-graphql';
+import { FUJoinTable } from './FUJoinTable';
 import { Fridge } from './Fridge';
 
 @ObjectType()
 @Entity('users')
 export class User extends BaseEntity {
+	// ---------------- fields ----------------
 	@Field()
 	@PrimaryGeneratedColumn()
 	id!: number;
@@ -31,10 +33,14 @@ export class User extends BaseEntity {
 	@Column('int', { default: 0 })
 	tokenVersion: number;
 
-	// 1 user can have access to many fridges
-	@OneToMany(() => Fridge, fridge => fridge.users)
+	// ---------------- relationship ----------------
+	@OneToMany(() => Fridge, fridge => fridge.owner)
 	fridges: Fridge[];
 
+	@OneToMany(() => FUJoinTable, fuTable => fuTable.user)
+	fuTables!: FUJoinTable[];
+
+	// ---------------- time ----------------
 	@Field(() => String)
 	@CreateDateColumn()
 	createdAt: Date;

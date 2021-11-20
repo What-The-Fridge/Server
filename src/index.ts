@@ -19,8 +19,8 @@ import redis from 'redis';
 import connectRedis from 'connect-redis';
 import { FridgeResolver } from './resolvers/FridgeResolver';
 import { FridgeItemResolver } from './resolvers/FridgeItemResolver';
-import { TestResolver } from './resolvers/TestResolver';
-const { Client } = require('pg');
+import { FUJoinTableResolver } from './resolvers/FUJoinTableResolver';
+import { Client } from 'pg';
 
 // declare a userId field in the session
 declare module 'express-session' {
@@ -163,7 +163,7 @@ export const client = new Client({
 				UserResolver,
 				FridgeResolver,
 				FridgeItemResolver,
-				TestResolver,
+				FUJoinTableResolver,
 			],
 		}),
 		context: ({ req, res }) => ({ req, res }),
