@@ -1,35 +1,13 @@
 import { FUJoinTable } from '../entities/FUJoinTable';
-import { User } from '../entities/User';
-import {
-	Arg,
-	Field,
-	Mutation,
-	ObjectType,
-	Query,
-	Resolver,
-} from 'type-graphql';
-import { FieldError } from './UserResolver';
+import { Arg, Mutation, Query, Resolver } from 'type-graphql';
 import { client } from '../index';
+import {
+	FridgesResponse,
+	FUResponse,
+	UsersResponse,
+} from '../utils/objectTypes/objectTypes';
+import { User } from '../entities/User';
 import { Fridge } from '../entities/Fridge';
-import { getConnection } from 'typeorm';
-
-@ObjectType()
-class FUResponse {
-	@Field(() => [FieldError], { nullable: true })
-	errors?: FieldError[];
-
-	@Field(() => FUJoinTable, { nullable: true })
-	fuTable?: FUJoinTable;
-}
-
-@ObjectType()
-class UsersResponse {
-	@Field(() => [FieldError], { nullable: true })
-	errors?: FieldError[];
-
-	@Field(() => FUJoinTable, { nullable: true })
-	users?: User[];
-}
 
 @Resolver(FUJoinTable)
 export class FUJoinTableResolver {
@@ -39,30 +17,6 @@ export class FUJoinTableResolver {
 		@Arg('fridgeId') fridgeId: number
 	): Promise<FUResponse> {
 		let fuTable;
-		const user = await User.findOne(userId);
-		const fridge = await Fridge.findOne(fridgeId);
-
-		if (!user) {
-			return {
-				errors: [
-					{
-						field: 'user',
-						message: "can't find the user",
-					},
-				],
-			};
-		}
-
-		if (!fridge) {
-			return {
-				errors: [
-					{
-						field: 'user',
-						message: "can't find the fridge",
-					},
-				],
-			};
-		}
 
 		try {
 			const result = await client.query(
@@ -72,7 +26,7 @@ export class FUJoinTableResolver {
 
 			fuTable = result.rows[0];
 		} catch (err) {
-			console.log(err);
+			// this will handle when userId and fridgeId don't exist
 			return {
 				errors: [
 					{
@@ -94,14 +48,32 @@ export class FUJoinTableResolver {
 		@Arg('fridgeId') fridgeId: number
 	): Promise<UsersResponse> {
 		let users;
+
+		const fridge = await Fridge.findOne(fridgeId);
+
+		if (!fridge) {
+			return {
+				errors: [
+					{
+						field: 'fridge',
+						message: "can't find the fridge",
+					},
+				],
+			};
+		}
+
 		try {
-			users = await getConnection()
-				.getRepository(User)
-				.createQueryBuilder('user')
-				.leftJoinAndSelect('user.fridges', 'fridge')
-				.getMany();
+			const result = await client.query(
+				`SELECT *
+					FROM public.users
+					INNER JOIN public.fu_join_table ON fu_join_table."userId" = users.id
+					WHERE fu_join_table."fridgeId" = $1;
+					`,
+				[fridgeId]
+			);
+
+			users = result.rows;
 		} catch (err) {
-			console.log(err);
 			return {
 				errors: [
 					{
@@ -116,5 +88,51 @@ export class FUJoinTableResolver {
 		}
 
 		return { users };
+	}
+
+	@Query(() => FridgesResponse)
+	async getUserFridges(
+		@Arg('userId') userId: number
+	): Promise<FridgesResponse> {
+		let fridges;
+
+		const user = await User.findOne(userId);
+		if (!user) {
+			return {
+				errors: [
+					{
+						field: 'user',
+						message: "can't find the user",
+					},
+				],
+			};
+		}
+
+		try {
+			const result = await client.query(
+				`SELECT *
+				FROM public.fridges
+				INNER JOIN public.fu_join_table ON fu_join_table."fridgeId" = fridges.id
+				WHERE fu_join_table."userId" = $1;
+				`,
+				[userId]
+			);
+
+			fridges = result.rows;
+		} catch (err) {
+			return {
+				errors: [
+					{
+						field: err.detail.substring(
+							err.detail.indexOf('(') + 1,
+							err.detail.indexOf(')')
+						),
+						message: err.detail,
+					},
+				],
+			};
+		}
+
+		return { fridges };
 	}
 }

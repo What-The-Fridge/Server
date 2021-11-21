@@ -1,49 +1,16 @@
-import {
-	Arg,
-	Ctx,
-	Field,
-	Int,
-	Mutation,
-	ObjectType,
-	Query,
-	Resolver,
-	UseMiddleware,
-} from 'type-graphql';
+import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql';
 import { User } from '../entities/User';
 import { MyContext } from '../utils/context/MyContext';
-import { isAuth } from '../utils/authentication/isAuth';
 import { getConnection } from 'typeorm';
 import { validateRegister } from '../utils/authentication/validateRegister';
 import argon2 from 'argon2';
 import { client } from '../index';
-
-@ObjectType()
-export class FieldError {
-	@Field()
-	field: string;
-	@Field()
-	message: string;
-}
-
-@ObjectType()
-class UserResponse {
-	@Field(() => [FieldError], { nullable: true })
-	errors?: FieldError[];
-
-	@Field(() => User, { nullable: true })
-	user?: User;
-}
+import { UserResponse } from '../utils/objectTypes/objectTypes';
 
 @Resolver(User)
 export class UserResolver {
 	@Query(() => String)
-	@UseMiddleware(isAuth)
-	hello() {
-		return 'hello!';
-	}
-
-	@Query(() => String)
-	bye(@Ctx() { req, payload }: MyContext) {
+	getUserId(@Ctx() { req, payload }: MyContext) {
 		if (!req.session.userId) {
 			return 'hi there';
 		}
@@ -60,7 +27,7 @@ export class UserResolver {
 	}
 
 	@Query(() => [User])
-	users() {
+	getAllUsers() {
 		return User.find();
 	}
 

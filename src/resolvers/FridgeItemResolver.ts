@@ -1,14 +1,6 @@
 import { FridgeItem } from '../entities/FridgeItem';
-// import { MyContext } from 'src/utils/context/MyContext';
-import { Arg, Field, InputType, Mutation, Resolver } from 'type-graphql';
-
-@InputType()
-class FridgeItemInput {
-	@Field()
-	name: string;
-	// @Field()
-	// fridgeItems: FridgeItem[];
-}
+import { Arg, Mutation, Resolver } from 'type-graphql';
+import { FridgeItemInput } from '../utils/objectTypes/objectTypes';
 
 @Resolver(FridgeItem)
 export class FridgeItemResolver {

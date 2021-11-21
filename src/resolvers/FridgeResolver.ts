@@ -1,18 +1,8 @@
 import { Fridge } from '../entities/Fridge';
 import { User } from '../entities/User';
-import { Arg, Field, Mutation, ObjectType, Resolver } from 'type-graphql';
-// import { getConnection } from 'typeorm';
-import { FieldError } from './UserResolver';
+import { Arg, Mutation, Resolver } from 'type-graphql';
 import { client } from '../index';
-
-@ObjectType()
-class FridgeResponse {
-	@Field(() => [FieldError], { nullable: true })
-	errors?: FieldError[];
-
-	@Field(() => Fridge, { nullable: true })
-	fridge?: Fridge;
-}
+import { FridgeResponse } from '../utils/objectTypes/objectTypes';
 
 @Resolver(Fridge)
 export class FridgeResolver {
@@ -43,7 +33,6 @@ export class FridgeResolver {
 
 			fridge = result.rows[0];
 		} catch (err) {
-			console.log(err);
 			return {
 				errors: [
 					{
