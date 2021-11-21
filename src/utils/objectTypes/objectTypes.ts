@@ -42,7 +42,7 @@ export class FUResponse {
 	errors?: FieldError[];
 
 	@Field(() => FUJoinTable, { nullable: true })
-	fuTable?: FUJoinTable;
+	fu?: FUJoinTable;
 }
 
 @ObjectType()
@@ -67,4 +67,13 @@ export class FridgesResponse {
 export class ErrorResponse {
 	@Field(() => [FieldError], { nullable: true })
 	errors?: FieldError[];
+}
+
+@ObjectType()
+export class DeleteResponse {
+	@Field(() => [FieldError], { nullable: true })
+	errors?: FieldError[];
+
+	@Field(() => Boolean)
+	deleted?: Boolean;
 }
