@@ -2,11 +2,15 @@ import { Field, InputType, ObjectType } from 'type-graphql';
 import { Fridge } from '../../entities/Fridge';
 import { User } from '../../entities/User';
 import { FUJoinTable } from '../../entities/FUJoinTable';
+import { FridgeItem } from '../../entities/FridgeItem';
 
 @InputType()
 export class FridgeItemInput {
 	@Field()
-	name: string;
+	name!: string;
+
+	@Field()
+	fridgeId!: number;
 }
 
 @ObjectType()
@@ -25,6 +29,15 @@ export class FridgeResponse {
 
 	@Field(() => Fridge, { nullable: true })
 	fridge?: Fridge;
+}
+
+@ObjectType()
+export class FridgeItemResponse {
+	@Field(() => [FieldError], { nullable: true })
+	errors?: FieldError[];
+
+	@Field(() => FridgeItem, { nullable: true })
+	fridgeItem?: FridgeItem;
 }
 
 @ObjectType()
@@ -70,10 +83,10 @@ export class ErrorResponse {
 }
 
 @ObjectType()
-export class DeleteResponse {
+export class BooleanResponse {
 	@Field(() => [FieldError], { nullable: true })
 	errors?: FieldError[];
 
 	@Field(() => Boolean)
-	deleted?: Boolean;
+	success?: Boolean;
 }

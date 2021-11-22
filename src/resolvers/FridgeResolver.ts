@@ -2,7 +2,10 @@ import { Fridge } from '../entities/Fridge';
 import { User } from '../entities/User';
 import { Arg, Mutation, Resolver } from 'type-graphql';
 import { client } from '../index';
-import { FridgeResponse } from '../utils/objectTypes/objectTypes';
+import {
+	BooleanResponse,
+	FridgeResponse,
+} from '../utils/objectTypes/objectTypes';
 
 @Resolver(Fridge)
 export class FridgeResolver {
@@ -81,5 +84,126 @@ export class FridgeResolver {
 		}
 
 		return { fridge };
+	}
+
+	/**
+	 * Deletes a fridge
+	 *
+	 * @param fridgeId id of the fridge
+	 * @return true or false based on whether the fridge is deleted. Upon errors, return the array of all the errors
+	 */
+	@Mutation(() => BooleanResponse)
+	async deleteFridge(
+		@Arg('fridgeId') fridgeId: number
+	): Promise<BooleanResponse> {
+		try {
+			const deleteFridge = await client.query(
+				`
+				DELETE FROM public.fridges
+				WHERE fridges.id = $1
+				`,
+				[fridgeId]
+			);
+
+			if (deleteFridge.rowCount > 0) {
+				return { success: true };
+			} else {
+				return {
+					success: false,
+					errors: [
+						{
+							field: 'fridge',
+							message: "nothing was deleted. This fridge doesn't exist",
+						},
+					],
+				};
+			}
+		} catch (err) {
+			return {
+				success: false,
+				errors: [
+					{
+						field: err.detail.substring(
+							err.detail.indexOf('(') + 1,
+							err.detail.indexOf(')')
+						),
+						message: err.detail,
+					},
+				],
+			};
+		}
+	}
+
+	/**
+	 * Transfers fridge's owner
+	 * ! The new owner must already be a member of the fridge
+	 *
+	 * @param fridgeId id of the fridge
+	 * @param newOwnerId id of the new owner, this user must already be a member of the fridge
+	 * @return true or false based on whether the owner is updated. Upon errors, return the array of all the errors
+	 */
+	@Mutation(() => BooleanResponse)
+	async transferFridgeOwner(
+		@Arg('fridgeId') fridgeId: number,
+		@Arg('newOwnerId') newOwnerId: number
+	): Promise<BooleanResponse> {
+		try {
+			const findFu = await client.query(
+				`
+				SELECT * FROM public.fu_join_table WHERE fu_join_table."fridgeId" = $1 AND fu_join_table."userId" = $2
+				`,
+				[fridgeId, newOwnerId]
+			);
+
+			if (findFu.rowCount != 1) {
+				return {
+					success: false,
+					errors: [
+						{
+							field: 'fu',
+							message:
+								'this fu combination does not exist. Make sure the user and the fridge exist. If they do, add the user to the fridge',
+						},
+					],
+				};
+			}
+
+			const changeOwner = await client.query(
+				`
+				UPDATE public.fridges
+				SET "ownerId" = $2
+				WHERE id = $1;
+				`,
+				[fridgeId, newOwnerId]
+			);
+
+			if (changeOwner.rowCount > 0) {
+				return { success: true };
+			} else {
+				return {
+					success: false,
+					errors: [
+						{
+							field: 'fridge',
+							message: "nothing was updated. This fridge or user don't exist",
+						},
+					],
+				};
+			}
+		} catch (err) {
+			console.log(err);
+			return {
+				success: false,
+				errors: [
+					{
+						field: err.detail.substring(
+							err.detail.indexOf('(') + 1,
+							err.detail.indexOf(')')
+						),
+						message: err.detail,
+					},
+				],
+			};
+		}
 	}
 }

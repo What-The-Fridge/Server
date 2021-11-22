@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { ObjectType, Field } from 'type-graphql';
 import { Fridge } from './Fridge';
+import { MeasurementType } from './MeasurementType';
 @ObjectType()
 @Entity('fridgeItems')
 export class FridgeItem extends BaseEntity {
@@ -22,31 +23,45 @@ export class FridgeItem extends BaseEntity {
 	name!: string;
 
 	@Field()
-	@Column()
+	@Column({ nullable: true })
 	quantity: number;
 
-	@Field()
-	@Column()
+	@Field(() => String)
+	@Column({ nullable: true, type: 'timestamptz' })
 	purchasedDate: Date;
 
-	@Field()
-	@Column()
+	@Field(() => String)
+	@Column({ nullable: true, type: 'timestamptz' })
 	expiryDate: Date;
 
 	@Field()
+	@Column({ nullable: true })
+	imgUrl: string;
+
+	@Field()
+	@Column({ nullable: true })
+	measurementTypeId: string; // foreign key to MeasurementType table
+
+	@Field()
 	@Column()
-	imgUrl: string; //optional
+	fridgeId!: string; // foreign key to Fridge table
 
 	// ---------------- relationship ----------------
+	@ManyToOne(
+		() => MeasurementType,
+		measurementType => measurementType.fridgeItem
+	)
+	measurementType: MeasurementType;
+
 	@ManyToOne(() => Fridge, fridge => fridge.fridgeItems)
 	fridge: Fridge;
 
 	// ---------------- time ----------------
 	@Field(() => String)
-	@CreateDateColumn()
+	@CreateDateColumn({ type: 'timestamptz' })
 	createdAt: Date;
 
 	@Field(() => String)
-	@UpdateDateColumn()
+	@UpdateDateColumn({ type: 'timestamptz' })
 	updatedAt: Date;
 }

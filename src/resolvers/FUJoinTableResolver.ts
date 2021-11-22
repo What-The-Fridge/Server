@@ -2,7 +2,7 @@ import { FUJoinTable } from '../entities/FUJoinTable';
 import { Arg, Mutation, Query, Resolver } from 'type-graphql';
 import { client } from '../index';
 import {
-	DeleteResponse,
+	BooleanResponse,
 	FridgesResponse,
 	FUResponse,
 	UsersResponse,
@@ -60,11 +60,11 @@ export class FUJoinTableResolver {
 	 * @param fridgeId id of the fridge
 	 * @return true or false based on whether the link is deleted. Upon errors, return the array of all the errors
 	 */
-	@Mutation(() => DeleteResponse)
+	@Mutation(() => BooleanResponse)
 	async deleteFU(
 		@Arg('userId') userId: number,
 		@Arg('fridgeId') fridgeId: number
-	): Promise<DeleteResponse> {
+	): Promise<BooleanResponse> {
 		try {
 			const ownerCheck = await client.query(
 				`
@@ -77,7 +77,7 @@ export class FUJoinTableResolver {
 
 			if (ownerCheck.rows[0]?.ownerId === userId) {
 				return {
-					deleted: false,
+					success: false,
 					errors: [
 						{
 							field: 'fu',
@@ -98,10 +98,10 @@ export class FUJoinTableResolver {
 			);
 
 			if (deleteFU.rowCount > 0) {
-				return { deleted: true };
+				return { success: true };
 			} else {
 				return {
-					deleted: false,
+					success: false,
 					errors: [
 						{
 							field: 'fu',
@@ -112,7 +112,7 @@ export class FUJoinTableResolver {
 			}
 		} catch (err) {
 			return {
-				deleted: false,
+				success: false,
 				errors: [
 					{
 						field: err.detail.substring(

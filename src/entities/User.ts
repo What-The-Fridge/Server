@@ -42,10 +42,10 @@ export class User extends BaseEntity {
 
 	// ---------------- time ----------------
 	@Field(() => String)
-	@CreateDateColumn()
+	@CreateDateColumn({ type: 'timestamptz' })
 	createdAt: Date;
 
 	@Field(() => String)
-	@UpdateDateColumn()
+	@UpdateDateColumn({ type: 'timestamptz' })
 	updatedAt: Date;
 }
