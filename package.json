@@ -4,6 +4,7 @@
 	"description": "Awesome project developed with TypeORM.",
 	"devDependencies": {
 		"@types/argon2": "^0.15.0",
+		"@types/axios": "^0.14.0",
 		"@types/bcryptjs": "^2.4.2",
 		"@types/connect-redis": "^0.0.17",
 		"@types/cookie-parser": "^1.4.2",
@@ -22,6 +23,7 @@
 	"dependencies": {
 		"apollo-server-express": "^3.4.0",
 		"argon2": "^0.28.2",
+		"axios": "^0.24.0",
 		"bcryptjs": "^2.4.3",
 		"class-validator": "^0.13.2",
 		"connect-redis": "^6.0.0",

@@ -18,11 +18,11 @@ export class MeasurementType extends BaseEntity {
 
 	@Field()
 	@PrimaryColumn()
-	name: string;
+	name!: string;
 
 	@Field()
 	@PrimaryColumn()
-	measurementSymbol: string;
+	measurementSymbol!: string;
 
 	// ---------------- relationship ----------------
 	@OneToMany(() => FridgeItem, fridgeItem => fridgeItem.measurementTypeId)

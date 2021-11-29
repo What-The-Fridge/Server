@@ -23,28 +23,32 @@ export class FridgeItem extends BaseEntity {
 	name!: string;
 
 	@Field()
+	@Column()
+	fridgeId!: string; // foreign key to Fridge table
+
+	@Field({ nullable: true })
+	@Column({ nullable: true })
+	upc: string;
+
+	@Field({ nullable: true })
 	@Column({ nullable: true })
 	quantity: number;
 
-	@Field(() => String)
+	@Field(() => String, { nullable: true })
 	@Column({ nullable: true, type: 'timestamptz' })
 	purchasedDate: Date;
 
-	@Field(() => String)
+	@Field(() => String, { nullable: true })
 	@Column({ nullable: true, type: 'timestamptz' })
 	expiryDate: Date;
 
-	@Field()
+	@Field({ nullable: true })
 	@Column({ nullable: true })
 	imgUrl: string;
 
-	@Field()
+	@Field({ nullable: true })
 	@Column({ nullable: true })
 	measurementTypeId: string; // foreign key to MeasurementType table
-
-	@Field()
-	@Column()
-	fridgeId!: string; // foreign key to Fridge table
 
 	// ---------------- relationship ----------------
 	@ManyToOne(

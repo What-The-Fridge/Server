@@ -11,6 +11,24 @@ export class FridgeItemInput {
 
 	@Field()
 	fridgeId!: number;
+
+	@Field({ nullable: true })
+	upc: string;
+
+	@Field({ nullable: true })
+	quantity: number;
+
+	@Field({ nullable: true })
+	purchasedDate: Date;
+
+	@Field({ nullable: true })
+	expiryDate: Date;
+
+	@Field({ nullable: true })
+	imgUrl: string;
+
+	@Field({ nullable: true })
+	measurementTypeId: string;
 }
 
 @ObjectType()

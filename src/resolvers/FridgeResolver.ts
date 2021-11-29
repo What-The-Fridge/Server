@@ -6,6 +6,7 @@ import {
 	BooleanResponse,
 	FridgeResponse,
 } from '../utils/objectTypes/objectTypes';
+import { deleteItemById } from './helpers/sharedFunctions';
 
 @Resolver(Fridge)
 export class FridgeResolver {
@@ -97,42 +98,7 @@ export class FridgeResolver {
 	async deleteFridge(
 		@Arg('fridgeId') fridgeId: number
 	): Promise<BooleanResponse> {
-		try {
-			const deleteFridge = await client.query(
-				`
-				DELETE FROM public.fridges
-				WHERE fridges.id = $1
-				`,
-				[fridgeId]
-			);
-
-			if (deleteFridge.rowCount > 0) {
-				return { success: true };
-			} else {
-				return {
-					success: false,
-					errors: [
-						{
-							field: 'fridge',
-							message: "nothing was deleted. This fridge doesn't exist",
-						},
-					],
-				};
-			}
-		} catch (err) {
-			return {
-				success: false,
-				errors: [
-					{
-						field: err.detail.substring(
-							err.detail.indexOf('(') + 1,
-							err.detail.indexOf(')')
-						),
-						message: err.detail,
-					},
-				],
-			};
-		}
+		return await deleteItemById(fridgeId, 'fridges');
 	}
 
 	/**
