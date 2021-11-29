@@ -64,7 +64,8 @@ export class FridgeResolver {
 						errors: [
 							{
 								field: 'fridge',
-								message: 'a fridge was created without an owner',
+								message:
+									'a fridge was created without an owner, so we deleted the invalid fridge. Please check the owner ID',
 							},
 						],
 					};
