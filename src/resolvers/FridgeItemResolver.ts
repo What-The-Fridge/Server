@@ -1,7 +1,8 @@
 import { FridgeItem } from '../entities/FridgeItem';
-import { Arg, Mutation, Resolver } from 'type-graphql';
+import { Arg, Mutation, Query, Resolver } from 'type-graphql';
 import {
 	BooleanResponse,
+	FridgeItemInfoNutritionix,
 	FridgeItemInput,
 	FridgeItemResponse,
 } from '../utils/objectTypes/objectTypes';
@@ -10,12 +11,18 @@ import { deleteItemById } from './helpers/sharedFunctions';
 import { fetchItemInfoByUPC } from './helpers/fridgeItemHelper';
 @Resolver(FridgeItem)
 export class FridgeItemResolver {
+	/**
+	 * Creates a fridge item
+	 *
+	 * @param input contains all the fields of fridge item object
+	 * E.g. input: {name: "Bananas", fridgeId: 13, upc: "06038318152", etc.}
+	 * Must have fields: name, fridgeId
+	 * @return newly created fridge. Upon errors, return the array of all the errors
+	 */
 	@Mutation(() => FridgeItemResponse)
 	async createFridgeItem(
 		@Arg('input') input: FridgeItemInput
 	): Promise<FridgeItemResponse> {
-		const itemInfo = await fetchItemInfoByUPC(input.upc);
-
 		let fridgeItem;
 		try {
 			const createFridgeItem = await client.query(
@@ -24,15 +31,13 @@ export class FridgeItemResolver {
 				VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *
 				`,
 				[
-					itemInfo
-						? `${itemInfo.food_name} - ${itemInfo.brand_name}`
-						: input.name,
+					input.name,
 					input.fridgeId,
-					itemInfo ? input.upc : null,
+					input.upc,
 					input.quantity,
 					input.purchasedDate,
 					input.expiryDate,
-					itemInfo ? itemInfo.photo.thumb : input.imgUrl,
+					input.imgUrl,
 					input.measurementTypeId,
 				]
 			);
@@ -61,5 +66,32 @@ export class FridgeItemResolver {
 		@Arg('itemId') itemId: number
 	): Promise<BooleanResponse> {
 		return await deleteItemById(itemId, 'fridgeItems');
+	}
+
+	@Query(() => FridgeItemInfoNutritionix)
+	async getItemInfoNutritionix(
+		@Arg('upc') upc: string
+	): Promise<FridgeItemInfoNutritionix> {
+		const itemInfo = await fetchItemInfoByUPC(upc);
+
+		if (itemInfo) {
+			return {
+				fridgeItemInfo: {
+					name: itemInfo.food_name,
+					brandName: itemInfo.brand_name,
+					imgUrl: itemInfo.photo.thumb,
+					ingredients: itemInfo.nf_ingredient_statement,
+				},
+			};
+		} else {
+			return {
+				errors: [
+					{
+						field: 'upc',
+						message: 'upc does not exist in our database',
+					},
+				],
+			};
+		}
 	}
 }

@@ -39,6 +39,21 @@ export class FieldError {
 	message: string;
 }
 
+@ObjectType()
+export class FridgeItemInfo {
+	@Field({ nullable: true })
+	name: string;
+
+	@Field({ nullable: true })
+	brandName: string;
+
+	@Field({ nullable: true })
+	imgUrl: string;
+
+	@Field({ nullable: true })
+	ingredients: string;
+}
+
 // -----------------------Resolver Response---------------------------
 @ObjectType()
 export class FridgeResponse {
@@ -56,6 +71,15 @@ export class FridgeItemResponse {
 
 	@Field(() => FridgeItem, { nullable: true })
 	fridgeItem?: FridgeItem;
+}
+
+@ObjectType()
+export class FridgeItemInfoNutritionix {
+	@Field(() => [FieldError], { nullable: true })
+	errors?: FieldError[];
+
+	@Field(() => FridgeItemInfo, { nullable: true })
+	fridgeItemInfo?: FridgeItemInfo;
 }
 
 @ObjectType()
