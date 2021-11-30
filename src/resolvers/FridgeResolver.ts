@@ -92,7 +92,7 @@ export class FridgeResolver {
 	 * Deletes a fridge
 	 *
 	 * @param fridgeId id of the fridge
-	 * @return true or false based on whether the fridge is deleted. Upon errors, return the array of all the errors
+	 * @return true/false based on whether deleted. Upon errors, return the array of all the errors
 	 */
 	@Mutation(() => BooleanResponse)
 	async deleteFridge(

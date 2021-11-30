@@ -9,6 +9,7 @@ import {
 import { client } from '../index';
 import { deleteItemById } from './helpers/sharedFunctions';
 import { fetchItemInfoByUPC } from './helpers/fridgeItemHelper';
+
 @Resolver(FridgeItem)
 export class FridgeItemResolver {
 	/**
@@ -61,6 +62,12 @@ export class FridgeItemResolver {
 		return { fridgeItem };
 	}
 
+	/**
+	 * Deletes a fridge item
+	 *
+	 * @param itemId Id of the fridge item to be deleted
+	 * @return true/false based on whether deleted. Upon errors, return the array of all the errors
+	 */
 	@Mutation(() => BooleanResponse)
 	async deleteFridgeItem(
 		@Arg('itemId') itemId: number
@@ -68,6 +75,14 @@ export class FridgeItemResolver {
 		return await deleteItemById(itemId, 'fridgeItems');
 	}
 
+	/**
+	 * Fetches data from Nutritrionix API
+	 *
+	 * @param upc 12 digits from the barcode
+	 * @return fridge item's info
+	 * E.g
+	 * {name: "Bananas", brandName: "No Name", imgUrl: "http://www.image.com", ingredients: "flour, eggs, etc."}
+	 */
 	@Query(() => FridgeItemInfoNutritionix)
 	async getItemInfoNutritionix(
 		@Arg('upc') upc: string
