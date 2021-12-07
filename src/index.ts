@@ -15,12 +15,13 @@ import {
 import { sendRefreshToken } from './utils/authentication/sendRefreshToken';
 import cors from 'cors';
 import session from 'express-session';
-import redis from 'redis';
-import connectRedis from 'connect-redis';
+// import redis from 'redis';
+// import connectRedis from 'connect-redis';
 import { FridgeResolver } from './resolvers/FridgeResolver';
 import { FridgeItemResolver } from './resolvers/FridgeItemResolver';
 import { FUJoinTableResolver } from './resolvers/FUJoinTableResolver';
 import { Client } from 'pg';
+import { isAuthRest } from './utils/authentication/isAuth';
 
 // declare a userId field in the session
 declare module 'express-session' {
@@ -73,29 +74,29 @@ export const client = new Client({
 	// enable this if you run behind a proxy (e.g. nginx)
 	app.set('trust proxy', 1);
 
-	// redis store session
-	const RedisStore = connectRedis(session);
-	//Configure redis client
-	const redisClient = redis.createClient({
-		host: 'localhost',
-		port: 6379,
-	});
+	// // redis store session
+	// const RedisStore = connectRedis(session);
+	// //Configure redis client
+	// const redisClient = redis.createClient({
+	// 	host: 'localhost',
+	// 	port: 6379,
+	// });
 
-	redisClient.on('error', function (err) {
-		console.log('Could not establish a connection with redis. ' + err);
-	});
-	redisClient.on('connect', function () {
-		console.log('Connected to redis successfully');
-	});
+	// redisClient.on('error', function (err) {
+	// 	console.log('Could not establish a connection with redis. ' + err);
+	// });
+	// redisClient.on('connect', function () {
+	// 	console.log('Connected to redis successfully');
+	// });
 
 	app.use(
 		session({
 			name: 'qid',
-			store: new RedisStore({
-				client: redisClient,
-				disableTTL: true,
-				disableTouch: true,
-			}),
+			// store: new RedisStore({
+			// 	client: redisClient,
+			// 	disableTTL: true,
+			// 	disableTouch: true,
+			// }),
 			cookie: {
 				maxAge: 1000 * 60 * 60 * 24,
 				httpOnly: true,
@@ -155,5 +156,15 @@ export const client = new Client({
 
 	app.listen(4000, () => {
 		console.log('express listening on port 4000');
+	});
+
+	app.use('/auth/login', isAuthRest, (_: any, res: any) => {
+		res.send({ message: 'hello' });
+		console.log('hello');
+	});
+
+	app.use('/hello', (_, res) => {
+		res.send({ message: 'hello' });
+		console.log('hello');
 	});
 })();

@@ -29,3 +29,35 @@ export const isAuth: MiddlewareFn<MyContext> = ({ context }, next) => {
 
 	return next();
 };
+
+export const isAuthRest = (req: any, _: any, next: any) => {
+	const authorization = req.headers['authorization'];
+	console.log(req.headers);
+
+	if (!authorization) {
+		console.log('not auth');
+		throw new Error('not authenticated');
+	}
+
+	if (authorization && authorization.split(' ')[0] !== 'Bearer') {
+		console.log('invalid token');
+		throw new Error('invalid token');
+	}
+
+	try {
+		const token = authorization.split(' ')[1];
+		admin
+			.auth()
+			.verifyIdToken(token)
+			.then(() => next())
+			.catch(() => {
+				console.log('cannot authenticate w firebase');
+				throw new Error('could not authenticate with firebase');
+			});
+	} catch (e) {
+		console.log('cannot connect');
+		throw new Error('cannot connect to firebase');
+	}
+
+	return next();
+};
