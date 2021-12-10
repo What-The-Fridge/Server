@@ -45,7 +45,6 @@ export class FridgeItemResolver {
 
 			fridgeItem = createFridgeItem.rows[0];
 		} catch (err) {
-			console.log(err);
 			return {
 				errors: [
 					{

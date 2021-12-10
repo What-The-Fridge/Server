@@ -19,19 +19,32 @@ export class User extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id!: number;
 
-	@Field()
+	@Field(() => String)
 	@Column({ unique: true })
-	username!: string;
+	firebaseUserUID!: string;
+
+	@Field(() => String)
+	@Column({ default: 'unspecified' })
+	firstName!: string;
+
+	@Field(() => String)
+	@Column({ default: 'unspecified' })
+	lastName!: string;
+
+	@Field(() => String)
+	@Column({
+		default:
+			'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png',
+	})
+	imgUrl: string;
 
 	@Field()
-	@Column({ unique: true })
-	email!: string;
-
-	@Column('text')
-	password!: string;
-
 	@Column('int', { default: 0 })
 	tokenVersion: number;
+
+	@Field()
+	@Column('int', { default: 0 })
+	tier: number;
 
 	// ---------------- relationship ----------------
 	@OneToMany(() => Fridge, fridge => fridge.owner)
