@@ -9,7 +9,7 @@ import {
 import { User } from '../entities/User';
 import { getConnection } from 'typeorm';
 import { client } from '../index';
-import { UserInput, UserResponse } from '../utils/objectTypes/objectTypes';
+import { BooleanResponse, DeleteUserInput, UserInput, UserResponse } from '../utils/objectTypes/objectTypes';
 import { isAuth } from '../utils/authentication/isAuth';
 
 @Resolver(User)
@@ -27,6 +27,50 @@ export class UserResolver {
 			.increment({ id: userId }, 'tokenVersion', 1);
 
 		return true;
+	}
+
+	@Mutation(() => BooleanResponse)
+	// @UseMiddleware(isAuth)
+	async deleteUser(@Arg('input') input: DeleteUserInput): Promise<BooleanResponse> {
+		if (!(input.firebaseUserUID || input.id))
+			return {
+				errors: [
+					{
+						field: 'input',
+						message: 'cannot identify delete target: need one of id or firebaseUserUID',
+					},
+				],
+			};
+
+		try {
+			const result = await client.query(
+				`DELETE FROM public.users WHERE users.id=$1 OR users."firebaseUserUID"=$2`,
+				[
+					input.id,
+					input.firebaseUserUID,
+				]
+			);
+			console.log(result);
+			if(result.rowCount)
+			{
+				return { success: true };
+			}
+			return { success: false };
+		} catch (err) {
+			return {
+				errors: [
+					{
+						field: err.detail.substring(
+							err.detail.indexOf('(') + 1,
+							err.detail.indexOf(')')
+						),
+						message: err.detail,
+					},
+				],
+			};
+		}
+
+		return { success: false };
 	}
 
 	@Mutation(() => UserResponse)

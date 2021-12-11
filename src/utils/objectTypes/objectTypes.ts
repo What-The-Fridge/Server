@@ -23,6 +23,15 @@ export class UserInput {
 }
 
 @InputType()
+export class DeleteUserInput {
+	@Field({ nullable: true })
+	firebaseUserUID: string;
+
+	@Field({ nullable: true })
+	id!: number;
+}
+
+@InputType()
 export class FridgeItemInput {
 	@Field()
 	name!: string;
