@@ -5,6 +5,24 @@ import { FUJoinTable } from '../../entities/FUJoinTable';
 import { FridgeItem } from '../../entities/FridgeItem';
 
 @InputType()
+export class UserInput {
+	@Field()
+	firebaseUserUID!: string;
+
+	@Field()
+	firstName!: string;
+
+	@Field()
+	lastName!: string;
+
+	@Field()
+	email: string;
+
+	@Field({ nullable: true })
+	imgUrl: string;
+}
+
+@InputType()
 export class FridgeItemInput {
 	@Field()
 	name!: string;

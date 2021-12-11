@@ -32,15 +32,15 @@ export class User extends BaseEntity {
 	lastName!: string;
 
 	@Field(() => String)
+	@Column({ default: 'unspecified' })
+	email: string;
+
+	@Field(() => String)
 	@Column({
 		default:
 			'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png',
 	})
 	imgUrl: string;
-
-	@Field()
-	@Column('int', { default: 0 })
-	tokenVersion: number;
 
 	@Field()
 	@Column('int', { default: 0 })
