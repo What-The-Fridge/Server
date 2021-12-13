@@ -46,9 +46,9 @@ export class FridgeItem extends BaseEntity {
 	@Column({ nullable: true })
 	imgUrl: string;
 
-	@Field()
-	@Column('int', { default: 0 })
-	measurementTypeId: number; // foreign key to MeasurementType table
+	@Field({ nullable: true})
+	@Column('int', { nullable: true, default: 0 })
+	measurementTypeId!: number; // foreign key to MeasurementType table
 
 	// ---------------- relationship ----------------
 	@ManyToOne(

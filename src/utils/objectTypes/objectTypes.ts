@@ -128,6 +128,15 @@ export class UsersResponse {
 }
 
 @ObjectType()
+export class FridgeItemsResponse {
+	@Field(() => [FieldError], { nullable: true })
+	errors?: FieldError[];
+
+	@Field(() => [FridgeItem], { nullable: true })
+	fridgeItems?: FridgeItem[];
+}
+
+@ObjectType()
 export class FridgesResponse {
 	@Field(() => [FieldError], { nullable: true })
 	errors?: FieldError[];
