@@ -19,8 +19,11 @@ Install and run PostgreSQL
 Create a .env file in ./backend/Node folder, ask Hachi for keys:
 
 ```sh
-ACCESS_TOKEN_SECRET=
-REFRESH_TOKEN_SECRET=
+ACCESS_TOKEN_SECRET = 
+REFRESH_TOKEN_SECRET = 
+SESSION_SECRET = 
+XAPPID = 
+XAPPKEY = 
 ```
 
 **Install**
