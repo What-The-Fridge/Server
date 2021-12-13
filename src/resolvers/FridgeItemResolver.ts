@@ -5,6 +5,7 @@ import {
 	FridgeItemInfoNutritionix,
 	FridgeItemInput,
 	FridgeItemResponse,
+	FridgeItemsResponse,
 } from '../utils/objectTypes/objectTypes';
 import { client } from '../index';
 import { deleteItemById } from './helpers/sharedFunctions';
@@ -107,5 +108,52 @@ export class FridgeItemResolver {
 				],
 			};
 		}
+	}
+
+	/**
+	 * Fetches all fridge items from a certain fridge
+	 *
+	 * @param fridgeId the id of the fridge
+	 * @return all fridge items of the fridge with the specified fridgeId
+	 */
+	@Query(() => FridgeItemsResponse)
+	async getFridgeFridgeItems(
+		@Arg('fridgeId') fridgeId: number
+	): Promise<FridgeItemsResponse> {
+		let fridgeItems;
+		try {
+			const getFridgeItems = await client.query(
+				`
+				SELECT * FROM "fridgeItems"
+				WHERE "fridgeItems"."fridgeId" = $1
+				`,
+				[fridgeId]
+			);
+			if (getFridgeItems == undefined) {
+				return {
+					errors: [
+						{
+							field: 'table: fridgeItems',
+							message: 'database returned undefined',
+						},
+					],
+				};
+			}
+
+			fridgeItems = getFridgeItems.rows;
+		} catch (err) {
+			return {
+				errors: [
+					{
+						field: err.detail.substring(
+							err.detail.indexOf('(') + 1,
+							err.detail.indexOf(')')
+						),
+						message: err.detail,
+					},
+				],
+			};
+		}
+		return { fridgeItems };
 	}
 }

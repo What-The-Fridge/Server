@@ -30,7 +30,7 @@ export class UserResolver {
 	}
 
 	@Mutation(() => UserResponse)
-	@UseMiddleware(isAuth)
+	// @UseMiddleware(isAuth)
 	async createUser(@Arg('input') input: UserInput): Promise<UserResponse> {
 		if (!(input.firstName && input.lastName && input.firebaseUserUID))
 			return {
@@ -56,6 +56,7 @@ export class UserResolver {
 					input.imgUrl,
 				]
 			);
+			console.log(result);
 
 			user = result.rows[0];
 		} catch (err) {
