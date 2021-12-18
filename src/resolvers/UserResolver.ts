@@ -30,7 +30,7 @@ export class UserResolver {
 	}
 
 	@Mutation(() => UserResponse)
-	// @UseMiddleware(isAuth)
+	@UseMiddleware(isAuth)
 	async createUser(@Arg('input') input: UserInput): Promise<UserResponse> {
 		if (!(input.firstName && input.lastName && input.firebaseUserUID))
 			return {
@@ -42,6 +42,7 @@ export class UserResolver {
 				],
 			};
 
+		console.log('hhhhh');
 		let user;
 		try {
 			const result = await client.query(
@@ -60,6 +61,7 @@ export class UserResolver {
 
 			user = result.rows[0];
 		} catch (err) {
+			console.log(err);
 			return {
 				errors: [
 					{

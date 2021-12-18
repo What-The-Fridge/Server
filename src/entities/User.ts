@@ -35,16 +35,17 @@ export class User extends BaseEntity {
 	@Column({ default: 'unspecified' })
 	email: string;
 
-	@Field(() => String)
+	@Field(() => String, { nullable: true })
 	@Column({
+		nullable: true,
 		default:
 			'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png',
 	})
 	imgUrl: string;
 
-	@Field()
+	@Field(() => Number)
 	@Column('int', { default: 0 })
-	tier: number;
+	tier!: number;
 
 	// ---------------- relationship ----------------
 	@OneToMany(() => Fridge, fridge => fridge.owner)
