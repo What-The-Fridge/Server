@@ -1,30 +1,33 @@
 import {
 	Entity,
 	BaseEntity,
-	PrimaryColumn,
 	OneToMany,
 	PrimaryGeneratedColumn,
+	Column,
 } from 'typeorm';
 import { Field, ObjectType } from 'type-graphql';
-import { FridgeItem } from './FridgeItem';
+import { FridgeItemInfo } from './FridgeItemInfo';
 
 @ObjectType()
-@Entity()
+@Entity('measurement_type')
 export class MeasurementType extends BaseEntity {
 	// ---------------- fields ----------------
 	@Field()
-	@PrimaryGeneratedColumn()
+	@PrimaryGeneratedColumn({ type: 'int' })
 	id!: number;
 
-	@Field()
-	@PrimaryColumn()
+	@Field(() => String)
+	@Column({ type: 'varchar' })
 	name!: string;
 
-	@Field()
-	@PrimaryColumn()
+	@Field(() => String)
+	@Column({ type: 'varchar' })
 	measurementSymbol!: string;
 
 	// ---------------- relationship ----------------
-	@OneToMany(() => FridgeItem, fridgeItem => fridgeItem.measurementTypeId)
-	fridgeItem: FridgeItem;
+	@OneToMany(
+		() => FridgeItemInfo,
+		fridgeItemInfo => fridgeItemInfo.measurementTypeId
+	)
+	fridgeItemInfo: FridgeItemInfo;
 }

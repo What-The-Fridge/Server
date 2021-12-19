@@ -4,7 +4,6 @@ import {
 	Column,
 	BaseEntity,
 	CreateDateColumn,
-	UpdateDateColumn,
 	OneToMany,
 	ManyToOne,
 } from 'typeorm';
@@ -18,16 +17,16 @@ import { User } from './User';
 export class Fridge extends BaseEntity {
 	// ---------------- fields ----------------
 	@Field()
-	@PrimaryGeneratedColumn()
+	@PrimaryGeneratedColumn({ type: 'int' })
 	id!: number;
 
-	@Field()
-	@Column()
+	@Field(() => String)
+	@Column({ type: 'varchar' })
 	name!: string;
 
-	@Field()
-	@Column()
-	ownerId!: number;
+	@Field(() => Number)
+	@Column({ type: 'int' })
+	ownerId!: number; // foreign key to users table
 
 	// ---------------- relationship ----------------
 	@ManyToOne(() => User, user => user.fridges)
@@ -43,8 +42,4 @@ export class Fridge extends BaseEntity {
 	@Field(() => String)
 	@CreateDateColumn({ type: 'timestamptz' })
 	createdAt: Date;
-
-	@Field(() => String)
-	@UpdateDateColumn({ type: 'timestamptz' })
-	updatedAt: Date;
 }

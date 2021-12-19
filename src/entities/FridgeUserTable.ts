@@ -1,4 +1,10 @@
-import { Entity, BaseEntity, ManyToOne, PrimaryColumn } from 'typeorm';
+import {
+	Entity,
+	BaseEntity,
+	ManyToOne,
+	Column,
+	PrimaryGeneratedColumn,
+} from 'typeorm';
 import { User } from './User';
 import { Fridge } from './Fridge';
 import { Field, ObjectType } from 'type-graphql';
@@ -8,15 +14,19 @@ import { Field, ObjectType } from 'type-graphql';
 // users -> join table <- posts
 // users -> FUJoinTable <- posts
 @ObjectType()
-@Entity()
+@Entity('fridge_user_table')
 export class FridgeUserTable extends BaseEntity {
 	// ---------------- fields ----------------
 	@Field()
-	@PrimaryColumn()
+	@PrimaryGeneratedColumn({ type: 'int' })
+	id!: number;
+
+	@Field(() => Number)
+	@Column({ type: 'int' })
 	userId: number;
 
-	@Field()
-	@PrimaryColumn()
+	@Field(() => Number)
+	@Column({ type: 'int' })
 	fridgeId: number;
 
 	// ---------------- relationship ----------------

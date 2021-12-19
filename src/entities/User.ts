@@ -4,49 +4,44 @@ import {
 	Column,
 	BaseEntity,
 	CreateDateColumn,
-	UpdateDateColumn,
 	OneToMany,
 } from 'typeorm';
 import { ObjectType, Field } from 'type-graphql';
 import { FridgeUserTable } from './FridgeUserTable';
 import { Fridge } from './Fridge';
-import { FridgeItem } from './FridgeItem';
+import { FridgeItemInfo } from './FridgeItemInfo';
 
 @ObjectType()
 @Entity('users')
 export class User extends BaseEntity {
 	// ---------------- fields ----------------
 	@Field()
-	@PrimaryGeneratedColumn()
+	@PrimaryGeneratedColumn({ type: 'int' })
 	id!: number;
 
 	@Field(() => String)
-	@Column({ unique: true })
+	@Column({ type: 'varchar', unique: true })
 	firebaseUserUID!: string;
 
 	@Field(() => String)
-	@Column({ default: 'unspecified' })
+	@Column({ type: 'varchar' })
 	firstName!: string;
 
 	@Field(() => String)
-	@Column({ default: 'unspecified' })
+	@Column({ type: 'varchar' })
 	lastName!: string;
 
+	@Field(() => Number)
+	@Column({ type: 'int' })
+	tier!: number;
+
 	@Field(() => String)
-	@Column({ default: 'unspecified' })
-	email: string;
+	@Column({ type: 'varchar' })
+	email!: string;
 
 	@Field(() => String, { nullable: true })
-	@Column({
-		nullable: true,
-		default:
-			'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png',
-	})
+	@Column({ type: 'varchar', nullable: true })
 	imgUrl: string;
-
-	@Field(() => Number)
-	@Column('int', { default: 0 })
-	tier!: number;
 
 	// ---------------- relationship ----------------
 	@OneToMany(() => Fridge, fridge => fridge.owner)
@@ -55,15 +50,11 @@ export class User extends BaseEntity {
 	@OneToMany(() => FridgeUserTable, fuTable => fuTable.user)
 	fuTables!: FridgeUserTable[];
 
-	@OneToMany(() => FridgeItem, fridgeItem => fridgeItem.user)
-	fridgeItems: FridgeItem[];
+	@OneToMany(() => FridgeItemInfo, fridgeItemInfo => fridgeItemInfo.user)
+	fridgeItemInfos: FridgeItemInfo[];
 
 	// ---------------- time ----------------
 	@Field(() => String)
 	@CreateDateColumn({ type: 'timestamptz' })
 	createdAt: Date;
-
-	@Field(() => String)
-	@UpdateDateColumn({ type: 'timestamptz' })
-	updatedAt: Date;
 }
