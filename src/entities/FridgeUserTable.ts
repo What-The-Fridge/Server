@@ -9,7 +9,7 @@ import { Field, ObjectType } from 'type-graphql';
 // users -> FUJoinTable <- posts
 @ObjectType()
 @Entity()
-export class FUJoinTable extends BaseEntity {
+export class FridgeUserTable extends BaseEntity {
 	// ---------------- fields ----------------
 	@Field()
 	@PrimaryColumn()

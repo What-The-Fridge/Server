@@ -12,7 +12,7 @@ import session from 'express-session';
 // import connectRedis from 'connect-redis';
 import { FridgeResolver } from './resolvers/FridgeResolver';
 import { FridgeItemResolver } from './resolvers/FridgeItemResolver';
-import { FUJoinTableResolver } from './resolvers/FUJoinTableResolver';
+import { FridgeUserTableResolver } from './resolvers/FridgeUserTableResolver';
 import { Client } from 'pg';
 import { isAuthRest } from './utils/authentication/isAuth';
 
@@ -109,7 +109,7 @@ export const client = new Client({
 				UserResolver,
 				FridgeResolver,
 				FridgeItemResolver,
-				FUJoinTableResolver,
+				FridgeUserTableResolver,
 			],
 		}),
 		context: ({ req, res }) => ({ req, res }),

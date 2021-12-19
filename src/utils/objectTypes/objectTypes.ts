@@ -1,7 +1,7 @@
 import { Field, InputType, ObjectType } from 'type-graphql';
 import { Fridge } from '../../entities/Fridge';
 import { User } from '../../entities/User';
-import { FUJoinTable } from '../../entities/FUJoinTable';
+import { FridgeUserTable } from '../../entities/FridgeUserTable';
 import { FridgeItem } from '../../entities/FridgeItem';
 
 @InputType()
@@ -114,8 +114,8 @@ export class FUResponse {
 	@Field(() => [FieldError], { nullable: true })
 	errors?: FieldError[];
 
-	@Field(() => FUJoinTable, { nullable: true })
-	fu?: FUJoinTable;
+	@Field(() => FridgeUserTable, { nullable: true })
+	fu?: FridgeUserTable;
 }
 
 @ObjectType()

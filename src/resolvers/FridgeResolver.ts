@@ -47,7 +47,7 @@ export class FridgeResolver {
 			fridge = createFridge.rows[0];
 
 			fu = await client.query(
-				'INSERT INTO fu_join_table ("userId", "fridgeId") VALUES ($1, $2) RETURNING *',
+				'INSERT INTO fridge_user_table ("userId", "fridgeId") VALUES ($1, $2) RETURNING *',
 				[ownerId, fridge.id]
 			);
 		} catch (err) {
@@ -117,7 +117,7 @@ export class FridgeResolver {
 		try {
 			const findFu = await client.query(
 				`
-				SELECT * FROM public.fu_join_table WHERE fu_join_table."fridgeId" = $1 AND fu_join_table."userId" = $2
+				SELECT * FROM public.fridge_user_table WHERE fridge_user_table."fridgeId" = $1 AND fridge_user_table."userId" = $2
 				`,
 				[fridgeId, newOwnerId]
 			);

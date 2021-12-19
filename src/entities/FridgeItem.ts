@@ -6,10 +6,12 @@ import {
 	CreateDateColumn,
 	UpdateDateColumn,
 	ManyToOne,
+	Unique,
 } from 'typeorm';
 import { ObjectType, Field } from 'type-graphql';
 import { Fridge } from './Fridge';
 import { MeasurementType } from './MeasurementType';
+import { User } from './User';
 @ObjectType()
 @Entity('fridgeItems')
 export class FridgeItem extends BaseEntity {
@@ -26,13 +28,13 @@ export class FridgeItem extends BaseEntity {
 	@Column()
 	fridgeId!: string; // foreign key to Fridge table
 
-	@Field({ nullable: true })
-	@Column({ nullable: true })
-	upc: string;
+	@Field()
+	@Column({ default: 34 })
+	userId!: string; // foreign key to User table
 
 	@Field({ nullable: true })
 	@Column({ nullable: true })
-	quantity: number;
+	upc: string;
 
 	@Field(() => String, { nullable: true })
 	@Column({ nullable: true, type: 'timestamptz' })
@@ -46,7 +48,11 @@ export class FridgeItem extends BaseEntity {
 	@Column({ nullable: true })
 	imgUrl: string;
 
-	@Field({ nullable: true})
+	@Field({ nullable: true })
+	@Column('int', { nullable: true, default: 1 })
+	quantity: number;
+
+	@Field({ nullable: true })
 	@Column('int', { nullable: true, default: 0 })
 	measurementTypeId!: number; // foreign key to MeasurementType table
 
@@ -59,6 +65,11 @@ export class FridgeItem extends BaseEntity {
 
 	@ManyToOne(() => Fridge, fridge => fridge.fridgeItems)
 	fridge: Fridge;
+
+	@ManyToOne(() => User, user => user.fridgeItems)
+	user: User;
+
+	@Unique(['sector', 'row', 'number'])
 
 	// ---------------- time ----------------
 	@Field(() => String)

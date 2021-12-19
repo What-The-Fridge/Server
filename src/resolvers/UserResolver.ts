@@ -29,6 +29,14 @@ export class UserResolver {
 		return true;
 	}
 
+	/**
+	 * Save a user's info to the database
+	 *
+	 * @param input contains all the fields of user object
+	 * E.g. input: {firstName: "Hachi", lastName: "Coding", firebaseUserUID: "JifJ1i4Gvjdp46pWsL98sgfsdg2", etc.}
+	 * Must have fields: firstName, lastName, firebaseUserUID
+	 * @return newly created user. Upon errors, return the array of all the errors
+	 */
 	@Mutation(() => UserResponse)
 	@UseMiddleware(isAuth)
 	async createUser(@Arg('input') input: UserInput): Promise<UserResponse> {

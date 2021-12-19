@@ -1,4 +1,4 @@
-import { FUJoinTable } from '../entities/FUJoinTable';
+import { FridgeUserTable } from '../entities/FridgeUserTable';
 import { Arg, Mutation, Query, Resolver } from 'type-graphql';
 import { client } from '../index';
 import {
@@ -10,8 +10,8 @@ import {
 import { User } from '../entities/User';
 import { Fridge } from '../entities/Fridge';
 
-@Resolver(FUJoinTable)
-export class FUJoinTableResolver {
+@Resolver(FridgeUserTable)
+export class FridgeUserTableResolver {
 	/**
 	 * Creates a link between a user and a fridge
 	 *
@@ -28,7 +28,7 @@ export class FUJoinTableResolver {
 
 		try {
 			const result = await client.query(
-				'INSERT INTO fu_join_table ("userId", "fridgeId") VALUES ($1, $2) RETURNING *',
+				'INSERT INTO fridge_user_table ("userId", "fridgeId") VALUES ($1, $2) RETURNING *',
 				[userId, fridgeId]
 			);
 
@@ -91,8 +91,8 @@ export class FUJoinTableResolver {
 			// delete FU
 			const deleteFU = await client.query(
 				`
-				DELETE FROM public.fu_join_table
-				WHERE fu_join_table."userId" = $1 AND fu_join_table."fridgeId" = $2
+				DELETE FROM public.fridge_user_table
+				WHERE fridge_user_table."userId" = $1 AND fridge_user_table."fridgeId" = $2
 				`,
 				[userId, fridgeId]
 			);
@@ -155,8 +155,8 @@ export class FUJoinTableResolver {
 			const result = await client.query(
 				`SELECT *
 					FROM public.users
-					INNER JOIN public.fu_join_table ON fu_join_table."userId" = users.id
-					WHERE fu_join_table."fridgeId" = $1;
+					INNER JOIN public.fridge_user_table ON fridge_user_table."userId" = users.id
+					WHERE fridge_user_table."fridgeId" = $1;
 					`,
 				[fridgeId]
 			);
@@ -207,8 +207,8 @@ export class FUJoinTableResolver {
 			const result = await client.query(
 				`SELECT *
 				FROM public.fridges
-				INNER JOIN public.fu_join_table ON fu_join_table."fridgeId" = fridges.id
-				WHERE fu_join_table."userId" = $1;
+				INNER JOIN public.fridge_user_table ON fridge_user_table."fridgeId" = fridges.id
+				WHERE fridge_user_table."userId" = $1;
 				`,
 				[userId]
 			);

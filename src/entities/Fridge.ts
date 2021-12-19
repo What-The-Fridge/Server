@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { ObjectType, Field } from 'type-graphql';
 import { FridgeItem } from './FridgeItem';
-import { FUJoinTable } from './FUJoinTable';
+import { FridgeUserTable } from './FridgeUserTable';
 import { User } from './User';
 
 @ObjectType()
@@ -33,8 +33,8 @@ export class Fridge extends BaseEntity {
 	@ManyToOne(() => User, user => user.fridges)
 	owner: User;
 
-	@OneToMany(() => FUJoinTable, fuTable => fuTable.fridge)
-	fuTables: FUJoinTable[];
+	@OneToMany(() => FridgeUserTable, fuTable => fuTable.fridge)
+	fuTables: FridgeUserTable[];
 
 	@OneToMany(() => FridgeItem, fridgeItem => fridgeItem.fridge)
 	fridgeItems: FridgeItem[];
