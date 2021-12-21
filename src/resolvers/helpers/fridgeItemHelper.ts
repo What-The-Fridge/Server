@@ -42,8 +42,7 @@ export async function fetchItemInfoByUPC(upc: string): Promise<false | any> {
 
 /**
  * Create an entry in fridgeItemInfo table
- * TODO: in case the fridgeItemInfo with specified upc already exists, we should update & use the existing one
- * TODO: make the combination of userId & upc unique
+ *
  * @param input contains all the fields of fridgeItem object
  * (fridgeItem object contains all fields from both fridgeItem and fridgeItemInfo tables)
  * E.g. input: {name: "Bananas", fridgeId: 13, upc: "06038318152", etc.}
@@ -51,15 +50,16 @@ export async function fetchItemInfoByUPC(upc: string): Promise<false | any> {
  * @return newly created fridgeItemInfo. Upon errors, return the array of all the errors
  */
 export async function createFridgeItemInfo(
-	input: FridgeItemInput
+	input: FridgeItemInput,
+	upc_user_constraint?: String
 ): Promise<FridgeItemInfoResponse> {
 	try {
 		const createFridgeItemInfo = await client.query(
 			`
 			INSERT INTO "fridgeItemInfo" ("name", "upc", "imgUrl", "userId", "measurementTypeId")
 			VALUES ($1, $2, $3, $4, $5)
-			ON CONFLICT (upc) DO UPDATE 
-				SET "name" = EXCLUDED."name", 
+			ON CONFLICT ON CONSTRAINT "${upc_user_constraint}"
+			DO UPDATE SET "name" = EXCLUDED."name", 
 						"upc" = EXCLUDED."upc",
 						"imgUrl" = EXCLUDED."imgUrl",
 						"userId" = EXCLUDED."userId",

@@ -4,4 +4,5 @@ export interface MyContext {
 	req: Request;
 	res: Response;
 	payload?: { userId: string };
+	upc_user_constraint?: String;
 }

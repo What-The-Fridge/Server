@@ -1,5 +1,5 @@
 import { FridgeItem } from '../entities/FridgeItem';
-import { Arg, Mutation, Query, Resolver } from 'type-graphql';
+import { Arg, Ctx, Mutation, Query, Resolver } from 'type-graphql';
 import {
 	BooleanResponse,
 	FridgeItemInfoNutritionix,
@@ -14,6 +14,7 @@ import {
 	createFridgeItemInfo,
 	fetchItemInfoByUPC,
 } from './helpers/fridgeItemHelper';
+import { MyContext } from 'src/utils/context/MyContext';
 
 @Resolver(FridgeItem)
 export class FridgeItemResolver {
@@ -27,11 +28,15 @@ export class FridgeItemResolver {
 	 */
 	@Mutation(() => FridgeItemResponse)
 	async createFridgeItem(
-		@Arg('input') input: FridgeItemInput
+		@Arg('input') input: FridgeItemInput,
+		@Ctx() { upc_user_constraint }: MyContext
 	): Promise<FridgeItemResponse> {
 		try {
 			console.log('here');
-			const fridgeItemInfo = await createFridgeItemInfo(input);
+			const fridgeItemInfo = await createFridgeItemInfo(
+				input,
+				upc_user_constraint
+			);
 
 			if (
 				fridgeItemInfo.errors === undefined &&
@@ -69,7 +74,7 @@ export class FridgeItemResolver {
 				errors: [
 					{
 						field: 'unknown',
-						message: err.toString(),
+						message: err,
 					},
 				],
 			};

@@ -8,13 +8,10 @@ import { createConnection } from 'typeorm';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import session from 'express-session';
-// import redis from 'redis';
-// import connectRedis from 'connect-redis';
 import { FridgeResolver } from './resolvers/FridgeResolver';
 import { FridgeItemResolver } from './resolvers/FridgeItemResolver';
 import { FridgeUserTableResolver } from './resolvers/FridgeUserTableResolver';
 import { Client } from 'pg';
-import { isAuthRest } from './utils/authentication/isAuth';
 
 // declare a userId field in the session
 declare module 'express-session' {
@@ -102,6 +99,18 @@ export const client = new Client({
 		})
 	);
 
+	const constraints = await client.query(
+		`
+		SELECT conname
+		FROM pg_constraint
+		WHERE conrelid =
+				(SELECT oid 
+				FROM pg_class
+				WHERE relname LIKE 'fridgeItemInfo')
+		AND contype = 'u';
+		`
+	);
+
 	await createConnection();
 	const apolloServer = new ApolloServer({
 		schema: await buildSchema({
@@ -112,23 +121,19 @@ export const client = new Client({
 				FridgeUserTableResolver,
 			],
 		}),
-		context: ({ req, res }) => ({ req, res }),
+		context: ({ req, res }) => ({
+			req,
+			res,
+			upc_user_constraint: constraints.rows[0]?.conname
+				? constraints.rows[0]?.conname
+				: 'constraint not found',
+		}),
 	});
 
 	await apolloServer.start();
 	apolloServer.applyMiddleware({ app, cors: false });
 
-	app.listen(4000, () => {
+	app.listen(5000, () => {
 		console.log('express listening on port 4000');
-	});
-
-	app.use('/auth/login', isAuthRest, (_: any, res: any) => {
-		res.send({ message: 'hello' });
-		console.log('hello');
-	});
-
-	app.use('/hello', (_, res) => {
-		res.send({ message: 'hello' });
-		console.log('hello');
 	});
 })();
