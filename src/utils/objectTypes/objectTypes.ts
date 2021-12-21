@@ -2,7 +2,8 @@ import { Field, InputType, ObjectType } from 'type-graphql';
 import { Fridge } from '../../entities/Fridge';
 import { User } from '../../entities/User';
 import { FridgeUserTable } from '../../entities/FridgeUserTable';
-import { FridgeItem } from '../../entities/FridgeItem';
+import { DetailedFridgeItem, FridgeItem } from '../../entities/FridgeItem';
+import { FridgeItemInfo } from '../../entities/FridgeItemInfo';
 
 @InputType()
 export class UserInput {
@@ -30,23 +31,26 @@ export class FridgeItemInput {
 	@Field()
 	fridgeId!: number;
 
+	@Field()
+	userId!: number;
+
+	@Field()
+	quantity!: number;
+
+	@Field()
+	measurementTypeId!: number;
+
 	@Field({ nullable: true })
 	upc: string;
 
 	@Field({ nullable: true })
-	quantity: number;
+	imgUrl: string;
 
 	@Field({ nullable: true })
 	purchasedDate: Date;
 
 	@Field({ nullable: true })
 	expiryDate: Date;
-
-	@Field({ nullable: true })
-	imgUrl: string;
-
-	@Field({ nullable: true })
-	measurementTypeId: string;
 }
 
 @ObjectType()
@@ -58,7 +62,7 @@ export class FieldError {
 }
 
 @ObjectType()
-export class FridgeItemInfo {
+export class FridgeItemDetailedInfo {
 	@Field({ nullable: true })
 	name: string;
 
@@ -83,12 +87,21 @@ export class FridgeResponse {
 }
 
 @ObjectType()
+export class FridgeItemInfoResponse {
+	@Field(() => [FieldError], { nullable: true })
+	errors?: FieldError[];
+
+	@Field(() => FridgeItemInfo, { nullable: true })
+	fridgeItemInfo?: FridgeItemInfo;
+}
+
+@ObjectType()
 export class FridgeItemResponse {
 	@Field(() => [FieldError], { nullable: true })
 	errors?: FieldError[];
 
-	@Field(() => FridgeItem, { nullable: true })
-	fridgeItem?: FridgeItem;
+	@Field(() => DetailedFridgeItem, { nullable: true })
+	detailedFridgeItem?: DetailedFridgeItem;
 }
 
 @ObjectType()
@@ -96,8 +109,8 @@ export class FridgeItemInfoNutritionix {
 	@Field(() => [FieldError], { nullable: true })
 	errors?: FieldError[];
 
-	@Field(() => FridgeItemInfo, { nullable: true })
-	fridgeItemInfo?: FridgeItemInfo;
+	@Field(() => FridgeItemDetailedInfo, { nullable: true })
+	fridgeItemInfo?: FridgeItemDetailedInfo;
 }
 
 @ObjectType()

@@ -49,3 +49,21 @@ export class FridgeItem extends BaseEntity {
 	@CreateDateColumn({ type: 'timestamptz' })
 	createdAt: Date;
 }
+
+@ObjectType()
+export class DetailedFridgeItem extends FridgeItem {
+	@Field(() => String)
+	name!: string;
+
+	@Field(() => String, { nullable: true })
+	upc: string;
+
+	@Field(() => String, { nullable: true })
+	imgUrl: string;
+
+	@Field(() => Number)
+	userId!: number; // foreign key to User table
+
+	@Field(() => Number)
+	measurementTypeId!: number; // foreign key to MeasurementType table
+}

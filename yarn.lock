@@ -536,10 +536,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.17.32.tgz#2ca61c9ef8c77f6fa1733be9e623ceb0d372ad96"
   integrity sha512-JcII3D5/OapPGx+eJ+Ik1SQGyt6WvuqdRfh9jUwL6/iHGjmyOriBDciBUu7lEIBTL2ijxwrR70WUnw5AEDmFvQ==
 
-"@types/pg@^8.6.1":
-  version "8.6.1"
-  resolved "https://registry.yarnpkg.com/@types/pg/-/pg-8.6.1.tgz#099450b8dc977e8197a44f5229cedef95c8747f9"
-  integrity sha512-1Kc4oAGzAl7uqUStZCDvaLFqZrW9qWSjXOmBfdgyBP5La7Us6Mg4GBvRlSoaZMhQF/zSj1C8CtKMBkoiT8eL8w==
+"@types/pg@^8.6.2":
+  version "8.6.2"
+  resolved "https://registry.yarnpkg.com/@types/pg/-/pg-8.6.2.tgz#eba3df3287eae69b374479eda94a569d72b9ae15"
+  integrity sha512-UbLp6B77Papo68M7jKXJHTqd3pBjodCsCE1WzsjSxeYtdxcOfpAk5NemXbuLaLhmlAbapIHJCBdv39UpiG4dsg==
   dependencies:
     "@types/node" "*"
     pg-protocol "*"

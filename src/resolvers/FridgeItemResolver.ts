@@ -9,57 +9,71 @@ import {
 } from '../utils/objectTypes/objectTypes';
 import { client } from '../index';
 import { deleteItemById } from './helpers/sharedFunctions';
-import { fetchItemInfoByUPC } from './helpers/fridgeItemHelper';
+import {
+	createFridgeItem,
+	createFridgeItemInfo,
+	fetchItemInfoByUPC,
+} from './helpers/fridgeItemHelper';
 
 @Resolver(FridgeItem)
 export class FridgeItemResolver {
 	/**
 	 * Creates a fridge item
 	 *
-	 * @param input contains all the fields of fridge item object
+	 * @param input contains all the fields of fridgeItem object
 	 * E.g. input: {name: "Bananas", fridgeId: 13, upc: "06038318152", etc.}
-	 * Must have fields: name, fridgeId
-	 * @return newly created fridge. Upon errors, return the array of all the errors
+	 * Must have fields: name, fridgeId, userId
+	 * @return newly created fridgeItem. Upon errors, return the array of all the errors
 	 */
 	@Mutation(() => FridgeItemResponse)
 	async createFridgeItem(
 		@Arg('input') input: FridgeItemInput
 	): Promise<FridgeItemResponse> {
-		let fridgeItem;
 		try {
-			const createFridgeItem = await client.query(
-				`
-				INSERT INTO "fridgeItems" ("name", "fridgeId", "upc", "quantity", "purchasedDate", "expiryDate", "imgUrl", "measurementTypeId") 
-				VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *
-				`,
-				[
-					input.name,
-					input.fridgeId,
-					input.upc,
-					input.quantity,
-					input.purchasedDate,
-					input.expiryDate,
-					input.imgUrl,
-					input.measurementTypeId,
-				]
-			);
+			console.log('here');
+			const fridgeItemInfo = await createFridgeItemInfo(input);
 
-			fridgeItem = createFridgeItem.rows[0];
+			if (
+				fridgeItemInfo.errors === undefined &&
+				fridgeItemInfo.fridgeItemInfo !== undefined
+			) {
+				const fridgeItem = await createFridgeItem(
+					fridgeItemInfo.fridgeItemInfo.id,
+					input
+				);
+
+				if (
+					fridgeItem.errors === undefined &&
+					fridgeItem.detailedFridgeItem !== undefined
+				) {
+					fridgeItem.detailedFridgeItem.name =
+						fridgeItemInfo.fridgeItemInfo.name;
+					fridgeItem.detailedFridgeItem.upc = fridgeItemInfo.fridgeItemInfo.upc;
+					fridgeItem.detailedFridgeItem.imgUrl =
+						fridgeItemInfo.fridgeItemInfo.imgUrl;
+					fridgeItem.detailedFridgeItem.userId =
+						fridgeItemInfo.fridgeItemInfo.userId;
+					fridgeItem.detailedFridgeItem.measurementTypeId =
+						fridgeItemInfo.fridgeItemInfo.measurementTypeId;
+					return fridgeItem;
+				} else {
+					return { errors: fridgeItem.errors };
+				}
+			} else {
+				return { errors: fridgeItemInfo.errors };
+			}
 		} catch (err) {
+			// should never reach here
+			// unless there is an error with calling the 2 helpers functions
 			return {
 				errors: [
 					{
-						field: err.detail.substring(
-							err.detail.indexOf('(') + 1,
-							err.detail.indexOf(')')
-						),
-						message: err.detail,
+						field: 'unknown',
+						message: err.toString(),
 					},
 				],
 			};
 		}
-
-		return { fridgeItem };
 	}
 
 	/**

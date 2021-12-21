@@ -6,6 +6,7 @@ import {
 	CreateDateColumn,
 	ManyToOne,
 	OneToMany,
+	Unique,
 } from 'typeorm';
 import { ObjectType, Field } from 'type-graphql';
 import { MeasurementType } from './MeasurementType';
@@ -14,6 +15,7 @@ import { FridgeItem } from './FridgeItem';
 
 @ObjectType()
 @Entity('fridgeItemInfo')
+@Unique(['upc', 'userId'])
 export class FridgeItemInfo extends BaseEntity {
 	// ---------------- fields ----------------
 	@Field()

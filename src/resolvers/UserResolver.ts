@@ -38,7 +38,7 @@ export class UserResolver {
 	 * @return newly created user. Upon errors, return the array of all the errors
 	 */
 	@Mutation(() => UserResponse)
-	@UseMiddleware(isAuth)
+	// @UseMiddleware(isAuth)
 	async createUser(@Arg('input') input: UserInput): Promise<UserResponse> {
 		if (!(input.firstName && input.lastName && input.firebaseUserUID))
 			return {
@@ -54,8 +54,8 @@ export class UserResolver {
 		let user;
 		try {
 			const result = await client.query(
-				`INSERT INTO users ("email", "firstName", "lastName", "firebaseUserUID", "imgUrl") 
-				VALUES ($1, $2, $3, $4, $5) 
+				`INSERT INTO users ("email", "firstName", "lastName", "firebaseUserUID", "imgUrl", "tier") 
+				VALUES ($1, $2, $3, $4, $5, $6) 
 				RETURNING *`,
 				[
 					input.email,
@@ -63,6 +63,7 @@ export class UserResolver {
 					input.lastName,
 					input.firebaseUserUID,
 					input.imgUrl,
+					1,
 				]
 			);
 			console.log(result);
