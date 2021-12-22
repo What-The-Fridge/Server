@@ -1,5 +1,28 @@
-import { BooleanResponse } from '../../utils/objectTypes/objectTypes';
+import {
+	BooleanResponse,
+	FieldError,
+} from '../../utils/objectTypes/objectTypes';
 import { client } from '../../index';
+
+export function makeErrors(fields: string[], messages: string[]): FieldError[] {
+	let errors: FieldError[] = [];
+	for (var i = 0; i < messages.length; i += 1) {
+		errors.push({ field: fields[i], message: messages[i] });
+	}
+	return errors;
+}
+
+export function postGresError(err: any): FieldError[] {
+	return [
+		{
+			field: err.detail.substring(
+				err.detail.indexOf('(') + 1,
+				err.detail.indexOf(')')
+			),
+			message: err.detail,
+		},
+	];
+}
 
 export async function deleteItemById(
 	id: number,
@@ -28,18 +51,9 @@ export async function deleteItemById(
 			};
 		}
 	} catch (err) {
-		console.log(err);
 		return {
 			success: false,
-			errors: [
-				{
-					field: err.detail.substring(
-						err.detail.indexOf('(') + 1,
-						err.detail.indexOf(')')
-					),
-					message: err.detail,
-				},
-			],
+			errors: postGresError(err),
 		};
 	}
 }

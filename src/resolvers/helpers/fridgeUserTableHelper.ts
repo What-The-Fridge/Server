@@ -1,5 +1,6 @@
 import { BooleanResponse } from '../../utils/objectTypes/objectTypes';
 import { client } from '../../index';
+import { postGresError } from './sharedFunctions';
 
 /**
  * Check if the user is part of the fridge organization
@@ -39,15 +40,7 @@ export async function fridgeUserLinkExists(
 	} catch (err) {
 		return {
 			success: false,
-			errors: [
-				{
-					field: err.detail.substring(
-						err.detail.indexOf('(') + 1,
-						err.detail.indexOf(')')
-					),
-					message: err.detail,
-				},
-			],
+			errors: postGresError(err),
 		};
 	}
 }

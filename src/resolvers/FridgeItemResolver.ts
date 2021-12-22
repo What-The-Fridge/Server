@@ -8,7 +8,7 @@ import {
 	FridgeItemsResponse,
 } from '../utils/objectTypes/objectTypes';
 import { client } from '../index';
-import { deleteItemById } from './helpers/sharedFunctions';
+import { deleteItemById, postGresError } from './helpers/sharedFunctions';
 import {
 	createFridgeItem,
 	createFridgeItemInfo,
@@ -172,15 +172,7 @@ export class FridgeItemResolver {
 			fridgeItems = getFridgeItems.rows;
 		} catch (err) {
 			return {
-				errors: [
-					{
-						field: err.detail.substring(
-							err.detail.indexOf('(') + 1,
-							err.detail.indexOf(')')
-						),
-						message: err.detail,
-					},
-				],
+				errors: postGresError(err),
 			};
 		}
 		return { fridgeItems: fridgeItems };

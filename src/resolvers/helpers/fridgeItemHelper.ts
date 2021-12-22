@@ -5,6 +5,7 @@ import {
 	FridgeItemInput,
 	FridgeItemResponse,
 } from 'src/utils/objectTypes/objectTypes';
+import { postGresError } from './sharedFunctions';
 
 /**
  * Fetch fridge/food item info through UPC
@@ -94,15 +95,7 @@ export async function createFridgeItemInfo(
 	} catch (err) {
 		console.log(err);
 		return {
-			errors: [
-				{
-					field: err.detail.substring(
-						err.detail.indexOf('(') + 1,
-						err.detail.indexOf(')')
-					),
-					message: err.detail,
-				},
-			],
+			errors: postGresError(err),
 		};
 	}
 }
@@ -154,15 +147,7 @@ export async function createFridgeItem(
 		}
 	} catch (err) {
 		return {
-			errors: [
-				{
-					field: err.detail.substring(
-						err.detail.indexOf('(') + 1,
-						err.detail.indexOf(')')
-					),
-					message: err.detail,
-				},
-			],
+			errors: postGresError(err),
 		};
 	}
 }

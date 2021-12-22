@@ -9,6 +9,7 @@ import {
 } from '../utils/objectTypes/objectTypes';
 import { User } from '../entities/User';
 import { Fridge } from '../entities/Fridge';
+import { postGresError } from './helpers/sharedFunctions';
 
 @Resolver(FridgeUserTable)
 export class FridgeUserTableResolver {
@@ -36,15 +37,7 @@ export class FridgeUserTableResolver {
 		} catch (err) {
 			// this will handle when userId and fridgeId don't exist
 			return {
-				errors: [
-					{
-						field: err.detail.substring(
-							err.detail.indexOf('(') + 1,
-							err.detail.indexOf(')')
-						),
-						message: err.detail,
-					},
-				],
+				errors: postGresError(err),
 			};
 		}
 
@@ -113,15 +106,7 @@ export class FridgeUserTableResolver {
 		} catch (err) {
 			return {
 				success: false,
-				errors: [
-					{
-						field: err.detail.substring(
-							err.detail.indexOf('(') + 1,
-							err.detail.indexOf(')')
-						),
-						message: err.detail,
-					},
-				],
+				errors: postGresError(err),
 			};
 		}
 	}
@@ -164,15 +149,7 @@ export class FridgeUserTableResolver {
 			users = result.rows;
 		} catch (err) {
 			return {
-				errors: [
-					{
-						field: err.detail.substring(
-							err.detail.indexOf('(') + 1,
-							err.detail.indexOf(')')
-						),
-						message: err.detail,
-					},
-				],
+				errors: postGresError(err),
 			};
 		}
 
@@ -216,15 +193,7 @@ export class FridgeUserTableResolver {
 			fridges = result.rows;
 		} catch (err) {
 			return {
-				errors: [
-					{
-						field: err.detail.substring(
-							err.detail.indexOf('(') + 1,
-							err.detail.indexOf(')')
-						),
-						message: err.detail,
-					},
-				],
+				errors: postGresError(err),
 			};
 		}
 

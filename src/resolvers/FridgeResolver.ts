@@ -6,7 +6,7 @@ import {
 	BooleanResponse,
 	FridgeResponse,
 } from '../utils/objectTypes/objectTypes';
-import { deleteItemById } from './helpers/sharedFunctions';
+import { deleteItemById, postGresError } from './helpers/sharedFunctions';
 
 @Resolver(Fridge)
 export class FridgeResolver {
@@ -73,15 +73,7 @@ export class FridgeResolver {
 				}
 			}
 			return {
-				errors: [
-					{
-						field: err.detail.substring(
-							err.detail.indexOf('(') + 1,
-							err.detail.indexOf(')')
-						),
-						message: err.detail,
-					},
-				],
+				errors: postGresError(err),
 			};
 		}
 
@@ -161,15 +153,7 @@ export class FridgeResolver {
 			console.log(err);
 			return {
 				success: false,
-				errors: [
-					{
-						field: err.detail.substring(
-							err.detail.indexOf('(') + 1,
-							err.detail.indexOf(')')
-						),
-						message: err.detail,
-					},
-				],
+				errors: postGresError(err),
 			};
 		}
 	}

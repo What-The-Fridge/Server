@@ -11,6 +11,7 @@ import { getConnection } from 'typeorm';
 import { client } from '../index';
 import { UserInput, UserResponse } from '../utils/objectTypes/objectTypes';
 import { isAuth } from '../utils/authentication/isAuth';
+import { postGresError } from './helpers/sharedFunctions';
 
 @Resolver(User)
 export class UserResolver {
@@ -50,7 +51,6 @@ export class UserResolver {
 				],
 			};
 
-		console.log('hhhhh');
 		let user;
 		try {
 			const result = await client.query(
@@ -66,21 +66,11 @@ export class UserResolver {
 					1,
 				]
 			);
-			console.log(result);
 
 			user = result.rows[0];
 		} catch (err) {
-			console.log(err);
 			return {
-				errors: [
-					{
-						field: err.detail.substring(
-							err.detail.indexOf('(') + 1,
-							err.detail.indexOf(')')
-						),
-						message: err.detail,
-					},
-				],
+				errors: postGresError(err),
 			};
 		}
 
