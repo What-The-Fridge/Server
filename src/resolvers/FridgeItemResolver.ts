@@ -15,6 +15,7 @@ import {
 	fetchItemInfoByUPC,
 } from './helpers/fridgeItemHelper';
 import { MyContext } from 'src/utils/context/MyContext';
+import { fridgeUserLinkExists } from './helpers/FridgeUserTableHelper';
 
 @Resolver(FridgeItem)
 export class FridgeItemResolver {
@@ -32,7 +33,12 @@ export class FridgeItemResolver {
 		@Ctx() { upc_user_constraint }: MyContext
 	): Promise<FridgeItemResponse> {
 		try {
-			console.log('here');
+			// check if the user is in the Fridge organization before fridge item creation
+			const fuExists = await fridgeUserLinkExists(input.fridgeId, input.userId);
+			if (fuExists.success !== true) {
+				return { errors: fuExists.errors };
+			}
+
 			const fridgeItemInfo = await createFridgeItemInfo(
 				input,
 				upc_user_constraint
@@ -143,8 +149,12 @@ export class FridgeItemResolver {
 		try {
 			const getFridgeItems = await client.query(
 				`
-				SELECT * FROM "fridgeItems"
+				SELECT *
+				FROM public."fridgeItems"
+				FULL OUTER JOIN public."fridgeItemInfo"
+				ON "fridgeItems"."fridgeItemInfoId" = "fridgeItemInfo"."id"
 				WHERE "fridgeItems"."fridgeId" = $1
+				ORDER BY "fridgeItems"."id";
 				`,
 				[fridgeId]
 			);
@@ -173,6 +183,6 @@ export class FridgeItemResolver {
 				],
 			};
 		}
-		return { fridgeItems };
+		return { fridgeItems: fridgeItems };
 	}
 }

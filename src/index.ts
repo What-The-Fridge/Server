@@ -133,7 +133,7 @@ export const client = new Client({
 	await apolloServer.start();
 	apolloServer.applyMiddleware({ app, cors: false });
 
-	app.listen(5000, () => {
+	app.listen(4000, () => {
 		console.log('express listening on port 4000');
 	});
 })();

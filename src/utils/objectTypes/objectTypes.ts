@@ -2,7 +2,7 @@ import { Field, InputType, ObjectType } from 'type-graphql';
 import { Fridge } from '../../entities/Fridge';
 import { User } from '../../entities/User';
 import { FridgeUserTable } from '../../entities/FridgeUserTable';
-import { DetailedFridgeItem, FridgeItem } from '../../entities/FridgeItem';
+import { DetailedFridgeItem } from '../../entities/FridgeItem';
 import { FridgeItemInfo } from '../../entities/FridgeItemInfo';
 
 @InputType()
@@ -145,8 +145,8 @@ export class FridgeItemsResponse {
 	@Field(() => [FieldError], { nullable: true })
 	errors?: FieldError[];
 
-	@Field(() => [FridgeItem], { nullable: true })
-	fridgeItems?: FridgeItem[];
+	@Field(() => [DetailedFridgeItem], { nullable: true })
+	fridgeItems?: DetailedFridgeItem[];
 }
 
 @ObjectType()
