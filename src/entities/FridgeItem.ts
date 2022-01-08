@@ -66,4 +66,10 @@ export class DetailedFridgeItem extends FridgeItem {
 
 	@Field(() => Number)
 	measurementTypeId!: number; // foreign key to MeasurementType table
+
+	@Field(() => String)
+	measurement!: string;
+
+	@Field(() => String)
+	measurementUnit!: string;
 }

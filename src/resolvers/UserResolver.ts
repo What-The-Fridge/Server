@@ -4,21 +4,36 @@ import {
 	Mutation,
 	Query,
 	Resolver,
-	UseMiddleware,
+	// UseMiddleware,
 } from 'type-graphql';
 import { User } from '../entities/User';
 import { getConnection } from 'typeorm';
 import { client } from '../index';
 import { UserInput, UserResponse } from '../utils/objectTypes/objectTypes';
-import { isAuth } from '../utils/authentication/isAuth';
+// import { isAuth } from '../utils/authentication/isAuth';
 import { postGresError } from './helpers/sharedFunctions';
 
 @Resolver(User)
 export class UserResolver {
-	@Query(() => [User])
-	@UseMiddleware(isAuth)
-	getAllUsers() {
-		return User.find();
+	@Query(() => UserResponse)
+	// @UseMiddleware(isAuth)
+	async getUserInfo(
+		@Arg('firebaseUserUID') firebaseUserUID: string
+	): Promise<UserResponse> {
+		const user = await User.findOne({
+			where: { firebaseUserUID: firebaseUserUID },
+		});
+
+		if (user) return { user: user };
+
+		return {
+			errors: [
+				{
+					field: 'firebaseUserUID',
+					message: 'no such user found',
+				},
+			],
+		};
 	}
 
 	@Mutation(() => Boolean)

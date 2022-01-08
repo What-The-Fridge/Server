@@ -151,13 +151,14 @@ export class FridgeItemResolver {
 				`
 				SELECT *
 				FROM public."fridgeItems"
-				FULL OUTER JOIN public."fridgeItemInfo"
-				ON "fridgeItems"."fridgeItemInfoId" = "fridgeItemInfo"."id"
+				FULL OUTER JOIN public."fridgeItemInfo" ON "fridgeItems"."fridgeItemInfoId" = "fridgeItemInfo"."id"
+				FULL OUTER JOIN public."measurement_type" ON "fridgeItemInfo"."measurementTypeId" = "measurement_type"."id"
 				WHERE "fridgeItems"."fridgeId" = $1
 				ORDER BY "fridgeItems"."id";
 				`,
 				[fridgeId]
 			);
+
 			if (getFridgeItems == undefined) {
 				return {
 					errors: [

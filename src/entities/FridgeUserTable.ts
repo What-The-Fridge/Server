@@ -2,8 +2,8 @@ import {
 	Entity,
 	BaseEntity,
 	ManyToOne,
-	Column,
-	PrimaryGeneratedColumn,
+	PrimaryColumn,
+	// PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from './User';
 import { Fridge } from './Fridge';
@@ -17,16 +17,12 @@ import { Field, ObjectType } from 'type-graphql';
 @Entity('fridge_user_table')
 export class FridgeUserTable extends BaseEntity {
 	// ---------------- fields ----------------
-	@Field()
-	@PrimaryGeneratedColumn({ type: 'int' })
-	id!: number;
-
 	@Field(() => Number)
-	@Column({ type: 'int' })
+	@PrimaryColumn({ type: 'int' })
 	userId: number;
 
 	@Field(() => Number)
-	@Column({ type: 'int' })
+	@PrimaryColumn({ type: 'int' })
 	fridgeId: number;
 
 	// ---------------- relationship ----------------

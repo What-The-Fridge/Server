@@ -17,12 +17,12 @@ export class MeasurementType extends BaseEntity {
 	id!: number;
 
 	@Field(() => String)
-	@Column({ type: 'varchar' })
-	name!: string;
+	@Column({ type: 'varchar', default: 'sdfsd' })
+	measurement!: string;
 
 	@Field(() => String)
-	@Column({ type: 'varchar' })
-	measurementSymbol!: string;
+	@Column({ type: 'varchar', default: 'sdfsd' })
+	measurementUnit!: string;
 
 	// ---------------- relationship ----------------
 	@OneToMany(

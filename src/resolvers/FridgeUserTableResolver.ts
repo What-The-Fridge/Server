@@ -184,7 +184,7 @@ export class FridgeUserTableResolver {
 			const result = await client.query(
 				`SELECT *
 				FROM public.fridges
-				INNER JOIN public.fridge_user_table ON fridge_user_table."fridgeId" = fridges.id
+				INNER JOIN public.fridge_user_table ON "fridge_user_table"."fridgeId" = "fridges"."id"
 				WHERE fridge_user_table."userId" = $1;
 				`,
 				[userId]
