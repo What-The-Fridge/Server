@@ -4,6 +4,7 @@ import { User } from '../../entities/User';
 import { FridgeUserTable } from '../../entities/FridgeUserTable';
 import { DetailedFridgeItem } from '../../entities/FridgeItem';
 import { FridgeItemInfo } from '../../entities/FridgeItemInfo';
+import { MeasurementType } from '../../entities/MeasurementType';
 
 @InputType()
 export class UserInput {
@@ -156,6 +157,15 @@ export class FridgesResponse {
 
 	@Field(() => [Fridge], { nullable: true })
 	fridges?: Fridge[];
+}
+
+@ObjectType()
+export class MeasurementTypesResponse {
+	@Field(() => [FieldError], { nullable: true })
+	errors?: FieldError[];
+
+	@Field(() => [MeasurementType], { nullable: true })
+	measurementTypes?: MeasurementType[];
 }
 
 @ObjectType()

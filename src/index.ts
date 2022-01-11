@@ -12,6 +12,7 @@ import { FridgeResolver } from './resolvers/FridgeResolver';
 import { FridgeItemResolver } from './resolvers/FridgeItemResolver';
 import { FridgeUserTableResolver } from './resolvers/FridgeUserTableResolver';
 import { Client } from 'pg';
+import { MeasurementTypeResolver } from './resolvers/MeasurementTypeResolver';
 
 // declare a userId field in the session
 declare module 'express-session' {
@@ -119,6 +120,7 @@ export const client = new Client({
 				FridgeResolver,
 				FridgeItemResolver,
 				FridgeUserTableResolver,
+				MeasurementTypeResolver,
 			],
 		}),
 		context: ({ req, res }) => ({
