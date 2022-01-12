@@ -133,6 +133,15 @@ export class FUResponse {
 }
 
 @ObjectType()
+export class MeasurementTypeResponse {
+	@Field(() => [FieldError], { nullable: true })
+	errors?: FieldError[];
+
+	@Field(() => MeasurementType, { nullable: true })
+	measurementType?: MeasurementType;
+}
+
+@ObjectType()
 export class UsersResponse {
 	@Field(() => [FieldError], { nullable: true })
 	errors?: FieldError[];

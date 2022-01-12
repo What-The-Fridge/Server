@@ -16,6 +16,7 @@ import {
 } from './helpers/fridgeItemHelper';
 import { MyContext } from 'src/utils/context/MyContext';
 import { fridgeUserLinkExists } from './helpers/FridgeUserTableHelper';
+import { getMeasurementTypeById } from './helpers/measurementTypeHelper';
 
 @Resolver(FridgeItem)
 export class FridgeItemResolver {
@@ -53,6 +54,10 @@ export class FridgeItemResolver {
 					input
 				);
 
+				let measurementType = await getMeasurementTypeById(
+					fridgeItemInfo.fridgeItemInfo.measurementTypeId
+				);
+
 				if (
 					fridgeItem.errors === undefined &&
 					fridgeItem.detailedFridgeItem !== undefined
@@ -66,7 +71,11 @@ export class FridgeItemResolver {
 						fridgeItemInfo.fridgeItemInfo.userId;
 					fridgeItem.detailedFridgeItem.measurementTypeId =
 						fridgeItemInfo.fridgeItemInfo.measurementTypeId;
-					return fridgeItem;
+					fridgeItem.detailedFridgeItem.measurement =
+						measurementType.measurementType!.measurement;
+					fridgeItem.detailedFridgeItem.measurementUnit =
+						measurementType.measurementType!.measurementUnit;
+					return { detailedFridgeItem: fridgeItem.detailedFridgeItem };
 				} else {
 					return { errors: fridgeItem.errors };
 				}
