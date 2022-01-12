@@ -149,12 +149,14 @@ export class FridgeItemResolver {
 		try {
 			const getFridgeItems = await client.query(
 				`
-				SELECT *
-				FROM public."fridgeItems"
-				FULL OUTER JOIN public."fridgeItemInfo" ON "fridgeItems"."fridgeItemInfoId" = "fridgeItemInfo"."id"
-				FULL OUTER JOIN public."measurement_type" ON "fridgeItemInfo"."measurementTypeId" = "measurement_type"."id"
-				WHERE "fridgeItems"."fridgeId" = $1
-				ORDER BY "fridgeItems"."id";
+				SELECT fi.*,
+				fii.id as "fridgeItemInfoId", fii.name, fii.upc, fii."imgUrl", fii."userId",
+				mt."id" as "measurementTypeId", mt.measurement, mt."measurementUnit"
+				FROM public."fridgeItems" as fi
+				FULL OUTER JOIN public."fridgeItemInfo" as fii ON fi."fridgeItemInfoId" = fii."id"
+				FULL OUTER JOIN public."measurement_type" as mt ON fii."measurementTypeId" = mt."id"
+				WHERE fi."fridgeId" = $1
+				ORDER BY fi."id";
 				`,
 				[fridgeId]
 			);
