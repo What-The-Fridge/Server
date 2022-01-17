@@ -10,6 +10,9 @@ import { ObjectType, Field } from 'type-graphql';
 import { FridgeUserTable } from './FridgeUserTable';
 import { Fridge } from './Fridge';
 import { FridgeItemInfo } from './FridgeItemInfo';
+import { GroceryListUserTable } from './GroceryListUserTable';
+import { GroceryList } from './GroceryList';
+import { GroceryItem } from './GroceryItem';
 
 @ObjectType()
 @Entity('users')
@@ -52,6 +55,15 @@ export class User extends BaseEntity {
 
 	@OneToMany(() => FridgeItemInfo, fridgeItemInfo => fridgeItemInfo.user)
 	fridgeItemInfos: FridgeItemInfo[];
+
+	@OneToMany(() => GroceryList, groceryList => groceryList.owner)
+	groceryLists: GroceryList[];
+
+	@OneToMany(() => GroceryListUserTable, gluTable => gluTable.user)
+	gluTables!: GroceryListUserTable[];
+
+	@OneToMany(() => GroceryItem, groceryItem => groceryItem.user)
+	groceryItems: GroceryItem[];
 
 	// ---------------- time ----------------
 	@Field(() => String)

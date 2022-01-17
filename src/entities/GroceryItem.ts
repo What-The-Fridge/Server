@@ -5,22 +5,28 @@ import {
 	BaseEntity,
 	CreateDateColumn,
 	ManyToOne,
-	OneToMany,
 	Unique,
 } from 'typeorm';
 import { ObjectType, Field } from 'type-graphql';
-import { MeasurementType } from './MeasurementType';
+import { GroceryList } from './GroceryList';
 import { User } from './User';
-import { FridgeItem } from './FridgeItem';
-
+import { MeasurementType } from './MeasurementType';
 @ObjectType()
-@Entity('fridgeItemInfo')
+@Entity('groceryItems')
 @Unique(['upc', 'userId'])
-export class FridgeItemInfo extends BaseEntity {
+export class GroceryItem extends BaseEntity {
 	// ---------------- fields ----------------
 	@Field()
 	@PrimaryGeneratedColumn({ type: 'int' })
 	id!: number;
+
+	@Field(() => Number)
+	@Column({ type: 'int' })
+	groceryListId!: number; // foreign key to GroceryList table
+
+	@Field(() => Number)
+	@Column({ type: 'int' })
+	quantity!: number;
 
 	@Field(() => String)
 	@Column({ type: 'varchar' })
@@ -43,17 +49,17 @@ export class FridgeItemInfo extends BaseEntity {
 	measurementTypeId!: number; // foreign key to MeasurementType table
 
 	// ---------------- relationship ----------------
-	@ManyToOne(
-		() => MeasurementType,
-		measurementType => measurementType.fridgeItemInfos
-	)
-	measurementType: MeasurementType;
+	@ManyToOne(() => GroceryList, groceryList => groceryList.groceryItems)
+	groceryList: GroceryList;
 
-	@ManyToOne(() => User, user => user.fridgeItemInfos)
+	@ManyToOne(() => User, user => user.groceryItems)
 	user: User;
 
-	@OneToMany(() => FridgeItem, fridgeItem => fridgeItem.fridgeItemInfo)
-	fridgeItems: FridgeItem[];
+	@ManyToOne(
+		() => MeasurementType,
+		measurementType => measurementType.groceryItems
+	)
+	measurementType: MeasurementType;
 
 	// ---------------- time ----------------
 	@Field(() => String)
