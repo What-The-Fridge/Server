@@ -5,11 +5,15 @@ import {
 	BaseEntity,
 	CreateDateColumn,
 	ManyToOne,
+	Unique,
 } from 'typeorm';
 import { ObjectType, Field } from 'type-graphql';
 import { GroceryList } from './GroceryList';
+import { User } from './User';
+import { MeasurementType } from './MeasurementType';
 @ObjectType()
 @Entity('groceryItems')
+@Unique(['upc', 'userId'])
 export class GroceryItem extends BaseEntity {
 	// ---------------- fields ----------------
 	@Field()
@@ -47,6 +51,15 @@ export class GroceryItem extends BaseEntity {
 	// ---------------- relationship ----------------
 	@ManyToOne(() => GroceryList, groceryList => groceryList.groceryItems)
 	groceryList: GroceryList;
+
+	@ManyToOne(() => User, user => user.groceryItems)
+	user: User;
+
+	@ManyToOne(
+		() => MeasurementType,
+		measurementType => measurementType.groceryItems
+	)
+	measurementType: MeasurementType;
 
 	// ---------------- time ----------------
 	@Field(() => String)

@@ -45,7 +45,7 @@ export class FridgeItemInfo extends BaseEntity {
 	// ---------------- relationship ----------------
 	@ManyToOne(
 		() => MeasurementType,
-		measurementType => measurementType.fridgeItemInfo
+		measurementType => measurementType.fridgeItemInfos
 	)
 	measurementType: MeasurementType;
 

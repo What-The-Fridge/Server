@@ -30,8 +30,8 @@ export class MeasurementType extends BaseEntity {
 		() => FridgeItemInfo,
 		fridgeItemInfo => fridgeItemInfo.measurementTypeId
 	)
-	fridgeItemInfo: FridgeItemInfo;
+	fridgeItemInfos: FridgeItemInfo[];
 
 	@OneToMany(() => GroceryItem, groceryItem => groceryItem.measurementTypeId)
-	groceryItem: GroceryItem;
+	groceryItems: GroceryItem[];
 }
