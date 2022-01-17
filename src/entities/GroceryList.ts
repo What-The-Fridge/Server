@@ -32,8 +32,8 @@ export class GroceryList extends BaseEntity {
 	@ManyToOne(() => User, user => user.groceryLists)
 	owner: User;
 
-	@OneToMany(() => GroceryListUserTable, gLUTable => gLUTable.groceryList)
-	gLUTables: GroceryListUserTable[];
+	@OneToMany(() => GroceryListUserTable, gluTable => gluTable.groceryList)
+	gluTables: GroceryListUserTable[];
 
 	@OneToMany(() => GroceryItem, groceryItem => groceryItem.groceryList)
 	groceryItems: GroceryItem[];

@@ -12,7 +12,6 @@ import { Fridge } from './Fridge';
 import { FridgeItemInfo } from './FridgeItemInfo';
 import { GroceryListUserTable } from './GroceryListUserTable';
 import { GroceryList } from './GroceryList';
-import { GroceryItemInfo } from './GroceryItemInfo';
 
 @ObjectType()
 @Entity('users')
@@ -59,11 +58,8 @@ export class User extends BaseEntity {
 	@OneToMany(() => GroceryList, groceryList => groceryList.owner)
 	groceryLists: GroceryList[];
 
-	@OneToMany(() => GroceryListUserTable, gLUTable => gLUTable.user)
-	gLUTables!: GroceryListUserTable[];
-
-	@OneToMany(() => GroceryItemInfo, groceryItemInfo => groceryItemInfo.user)
-	groceryItemInfos: GroceryItemInfo[];
+	@OneToMany(() => GroceryListUserTable, gluTable => gluTable.user)
+	gluTables!: GroceryListUserTable[];
 
 	// ---------------- time ----------------
 	@Field(() => String)

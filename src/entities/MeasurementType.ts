@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { Field, ObjectType } from 'type-graphql';
 import { FridgeItemInfo } from './FridgeItemInfo';
-import { GroceryItemInfo } from './GroceryItemInfo';
+import { GroceryItem } from './GroceryItem';
 
 @ObjectType()
 @Entity('measurement_type')
@@ -32,9 +32,6 @@ export class MeasurementType extends BaseEntity {
 	)
 	fridgeItemInfo: FridgeItemInfo;
 
-	@OneToMany(
-		() => GroceryItemInfo,
-		groceryItemInfo => groceryItemInfo.measurementTypeId
-	)
-	groceryItemInfo: GroceryItemInfo;
+	@OneToMany(() => GroceryItem, groceryItem => groceryItem.measurementTypeId)
+	groceryItem: GroceryItem;
 }

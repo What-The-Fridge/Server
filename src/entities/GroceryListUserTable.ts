@@ -26,10 +26,10 @@ export class GroceryListUserTable extends BaseEntity {
 	groceryListId: number;
 
 	// ---------------- relationship ----------------
-	@ManyToOne(() => User, user => user.gLUTables)
+	@ManyToOne(() => User, user => user.gluTables)
 	user: User;
 
-	@ManyToOne(() => GroceryList, groceryList => groceryList.gLUTables, {
+	@ManyToOne(() => GroceryList, groceryList => groceryList.gluTables, {
 		onDelete: 'CASCADE',
 	})
 	groceryList: GroceryList;
