@@ -111,6 +111,7 @@ export class FridgeItemResolver {
 
 	/**
 	 * Deletes all fridge items of a fridge
+	 * TODO: more testing needed
 	 *
 	 * @param fridgeId Id of the fridge
 	 * @return true/false based on whether deleted. Upon errors, return the array of all the errors
@@ -144,7 +145,7 @@ export class FridgeItemResolver {
 			fridgeItemInfoIds.forEach(async element => {
 				await client.query(
 					`
-					DELETE FROM public."fridgeItemInfo" WHERE "fridgeItemInfo".id = $1 AND "fridgeItemInfo".id IS NOT NULL;
+					DELETE FROM public."fridgeItemInfo" WHERE "fridgeItemInfo".id = $1 AND "fridgeItemInfo".upc IS NULL;
 				`,
 					[element]
 				);
