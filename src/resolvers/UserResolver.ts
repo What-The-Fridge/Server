@@ -1,17 +1,19 @@
 import {
 	Arg,
-	Int,
 	Mutation,
 	Query,
 	Resolver,
 	// UseMiddleware,
 } from 'type-graphql';
 import { User } from '../entities/User';
-import { getConnection } from 'typeorm';
 import { client } from '../index';
-import { UserInput, UserResponse } from '../utils/objectTypes/objectTypes';
+import {
+	BooleanResponse,
+	UserInput,
+	UserResponse,
+} from '../utils/objectTypes/objectTypes';
 // import { isAuth } from '../utils/authentication/isAuth';
-import { postGresError } from './helpers/sharedFunctions';
+import { deleteItemById, postGresError } from './helpers/sharedFunctions';
 
 @Resolver(User)
 export class UserResolver {
@@ -36,13 +38,16 @@ export class UserResolver {
 		};
 	}
 
-	@Mutation(() => Boolean)
-	async revokeRefreshTokensForUser(@Arg('userId', () => Int) userId: number) {
-		await getConnection()
-			.getRepository(User)
-			.increment({ id: userId }, 'tokenVersion', 1);
-
-		return true;
+	/**
+	 * Deletes a user
+	 * TODO: clear all the fridges && items linked to this user
+	 *
+	 * @param userId id of the user
+	 * @return true/false based on whether deleted. Upon errors, return the array of all the errors
+	 */
+	@Mutation(() => BooleanResponse)
+	async deleteUser(@Arg('userId') userId: number): Promise<BooleanResponse> {
+		return await deleteItemById(userId, 'users');
 	}
 
 	/**

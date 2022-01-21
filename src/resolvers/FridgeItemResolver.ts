@@ -110,6 +110,58 @@ export class FridgeItemResolver {
 	}
 
 	/**
+	 * Deletes all fridge items of a fridge
+	 * TODO: more testing needed
+	 *
+	 * @param fridgeId Id of the fridge
+	 * @return true/false based on whether deleted. Upon errors, return the array of all the errors
+	 */
+	@Mutation(() => BooleanResponse)
+	async clearFridgeItems(
+		@Arg('fridgeId') fridgeId: number
+	): Promise<BooleanResponse> {
+		try {
+			// get all the ids of the fridgeItemInfo entries that we will delete
+			const getFridgeItemInfoIds = await client.query(
+				`
+				SELECT * FROM public."fridgeItems" WHERE "fridgeItems"."fridgeId"=$1;
+			`,
+				[fridgeId]
+			);
+
+			const fridgeItemInfoIds = getFridgeItemInfoIds.rows.map(element => {
+				return element.fridgeItemInfoId;
+			});
+
+			// delete all the entries from the fridgeItems table
+			const deleteFridgeItems = await client.query(
+				`
+				DELETE FROM public."fridgeItems" WHERE "fridgeItems"."fridgeId"=$1;
+			`,
+				[fridgeId]
+			);
+
+			// delete all the entries from the fridgeItemInfos table
+			fridgeItemInfoIds.forEach(async element => {
+				await client.query(
+					`
+					DELETE FROM public."fridgeItemInfo" WHERE "fridgeItemInfo".id = $1 AND "fridgeItemInfo".upc IS NULL;
+				`,
+					[element]
+				);
+			});
+
+			console.log(deleteFridgeItems);
+
+			return { success: true };
+		} catch (err) {
+			return {
+				errors: postGresError(err),
+			};
+		}
+	}
+
+	/**
 	 * Fetches data from Nutritrionix API
 	 *
 	 * @param upc 12 digits from the barcode
