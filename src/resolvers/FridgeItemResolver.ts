@@ -106,7 +106,49 @@ export class FridgeItemResolver {
 	async deleteFridgeItem(
 		@Arg('itemId') itemId: number
 	): Promise<BooleanResponse> {
-		return await deleteItemById(itemId, 'fridgeItems');
+		try {
+			const getFridgeItemInfoId = await client.query(
+				`
+					SELECT * FROM public."fridgeItems" WHERE "fridgeItems"."id"=$1;
+				`,
+				[itemId]
+			);
+
+			if (getFridgeItemInfoId.rowCount == 1) {
+				const deleteItem = await deleteItemById(itemId, 'fridgeItems');
+
+				if (!deleteItem.success) return deleteItem;
+
+				// TODO: more testing
+				try {
+					await client.query(
+						`
+						DELETE FROM public."fridgeItemInfo" WHERE "fridgeItemInfo".id = $1 AND "fridgeItemInfo".upc IS NULL;
+					`,
+						[getFridgeItemInfoId.rows[0].fridgeItemInfoId]
+					);
+
+					return { success: true };
+				} catch (err) {
+					return {
+						errors: postGresError(err),
+					};
+				}
+			} else {
+				return {
+					errors: [
+						{
+							field: 'fridgeItems',
+							message: 'fridgeItem does not exist',
+						},
+					],
+				};
+			}
+		} catch (err) {
+			return {
+				errors: postGresError(err),
+			};
+		}
 	}
 
 	/**
@@ -232,8 +274,6 @@ export class FridgeItemResolver {
 					],
 				};
 			}
-
-			fridgeItems = getFridgeItems.rows;
 		} catch (err) {
 			return {
 				errors: postGresError(err),
