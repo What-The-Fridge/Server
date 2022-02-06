@@ -7,6 +7,7 @@ import {
 	FridgeResponse,
 } from '../utils/objectTypes/objectTypes';
 import { deleteItemById, postGresError } from './helpers/sharedFunctions';
+import { clearFridgeItems } from './helpers/fridgeHelper';
 
 @Resolver(Fridge)
 export class FridgeResolver {
@@ -90,6 +91,17 @@ export class FridgeResolver {
 	async deleteFridge(
 		@Arg('fridgeId') fridgeId: number
 	): Promise<BooleanResponse> {
+		const clearFridge = await clearFridgeItems(fridgeId);
+		if (!clearFridge.success) {
+			return {
+				errors: [
+					{
+						field: 'fridgeItems',
+						message: 'could not clear all the items of the fridge',
+					},
+				],
+			};
+		}
 		return await deleteItemById(fridgeId, 'fridges');
 	}
 
@@ -150,7 +162,6 @@ export class FridgeResolver {
 				};
 			}
 		} catch (err) {
-			console.log(err);
 			return {
 				success: false,
 				errors: postGresError(err),

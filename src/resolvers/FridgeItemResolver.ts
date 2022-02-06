@@ -17,6 +17,7 @@ import {
 import { MyContext } from 'src/utils/context/MyContext';
 import { fridgeUserLinkExists } from './helpers/FridgeUserTableHelper';
 import { getMeasurementTypeById } from './helpers/measurementTypeHelper';
+import { clearFridgeItems } from './helpers/fridgeHelper';
 
 @Resolver(FridgeItem)
 export class FridgeItemResolver {
@@ -162,45 +163,7 @@ export class FridgeItemResolver {
 	async clearFridgeItems(
 		@Arg('fridgeId') fridgeId: number
 	): Promise<BooleanResponse> {
-		try {
-			// get all the ids of the fridgeItemInfo entries that we will delete
-			const getFridgeItemInfoIds = await client.query(
-				`
-				SELECT * FROM public."fridgeItems" WHERE "fridgeItems"."fridgeId"=$1;
-			`,
-				[fridgeId]
-			);
-
-			const fridgeItemInfoIds = getFridgeItemInfoIds.rows.map(element => {
-				return element.fridgeItemInfoId;
-			});
-
-			// delete all the entries from the fridgeItems table
-			const deleteFridgeItems = await client.query(
-				`
-				DELETE FROM public."fridgeItems" WHERE "fridgeItems"."fridgeId"=$1;
-			`,
-				[fridgeId]
-			);
-
-			// delete all the entries from the fridgeItemInfos table
-			fridgeItemInfoIds.forEach(async element => {
-				await client.query(
-					`
-					DELETE FROM public."fridgeItemInfo" WHERE "fridgeItemInfo".id = $1 AND "fridgeItemInfo".upc IS NULL;
-				`,
-					[element]
-				);
-			});
-
-			console.log(deleteFridgeItems);
-
-			return { success: true };
-		} catch (err) {
-			return {
-				errors: postGresError(err),
-			};
-		}
+		return clearFridgeItems(fridgeId);
 	}
 
 	/**
@@ -274,6 +237,8 @@ export class FridgeItemResolver {
 					],
 				};
 			}
+
+			fridgeItems = getFridgeItems.rows;
 		} catch (err) {
 			return {
 				errors: postGresError(err),
