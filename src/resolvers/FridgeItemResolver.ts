@@ -167,6 +167,60 @@ export class FridgeItemResolver {
 	}
 
 	/**
+	 * Fetches a fridge item with a certain id
+	 *
+	 * @param id the id of the fridgeItem
+	 * @return info of the fridge item with the specified id
+	 */
+	@Query(() => FridgeItemResponse)
+	async getFridgeItemById(@Arg('id') id: number): Promise<FridgeItemResponse> {
+		let detailedFridgeItem;
+		try {
+			const getFridgeItem = await client.query(
+				`
+				SELECT fi.*,
+				fii.id as "fridgeItemInfoId", fii.name, fii.upc, fii."imgUrl", fii."userId",
+				mt."id" as "measurementTypeId", mt.measurement, mt."measurementUnit"
+				FROM public."fridgeItems" as fi
+				FULL OUTER JOIN public."fridgeItemInfo" as fii ON fi."fridgeItemInfoId" = fii."id"
+				FULL OUTER JOIN public."measurement_type" as mt ON fii."measurementTypeId" = mt."id"
+				WHERE fi."id" = $1
+				`,
+				[id]
+			);
+
+			if (getFridgeItem == undefined) {
+				return {
+					errors: [
+						{
+							field: 'table: fridgeItems',
+							message: 'database returned undefined',
+						},
+					],
+				};
+			}
+
+			if (getFridgeItem.rows[0] == null) {
+				return {
+					errors: [
+						{
+							field: 'table: fridgeItems',
+							message: 'cannot find such item',
+						},
+					],
+				};
+			}
+
+			detailedFridgeItem = getFridgeItem.rows[0];
+		} catch (err) {
+			return {
+				errors: postGresError(err),
+			};
+		}
+		return { detailedFridgeItem };
+	}
+
+	/**
 	 * Fetches data from Nutritrionix API
 	 *
 	 * @param upc 12 digits from the barcode
