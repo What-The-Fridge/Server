@@ -153,6 +153,83 @@ export class FridgeItemResolver {
 	}
 
 	/**
+	 * Updates a fridge item
+	 *
+	 * @param input contains all the fields of fridgeItem object
+	 * E.g. input: {name: "Bananas", fridgeId: 13, upc: "06038318152", etc.}
+	 *
+	 * @return true/false based on whether updated. Upon errors, return the array of all the errors
+	 */
+	@Mutation(() => BooleanResponse)
+	async updateFridgeItem(
+		@Arg('input') input: FridgeItemInput,
+		@Arg('fridgeId') fridgeId: Number
+	): Promise<BooleanResponse> {
+		try {
+			const updateFridgeItem = await client.query(
+				`
+				UPDATE public."fridgeItems"
+				SET 
+					quantity = $1,
+					"purchasedDate" = $2,
+					"expiryDate" = $3
+				WHERE "fridgeItems"."id" = $4
+				RETURNING *;
+				`,
+				[input.quantity, input.purchasedDate, input.expiryDate, fridgeId]
+			);
+
+			if (updateFridgeItem.rowCount !== 1) {
+				return {
+					errors: [
+						{
+							field: 'table: fridgeItems',
+							message: 'cannot find such item to update',
+						},
+					],
+				};
+			}
+
+			const updateFridgeItemInfo = await client.query(
+				`
+				UPDATE public."fridgeItemInfo"
+				SET 
+					name = $1,
+					upc = $2,
+					"imgUrl" = $3,
+					"measurementTypeId" = $4
+				WHERE "fridgeItemInfo"."id" = $5
+				RETURNING *;
+				`,
+				[
+					input.name,
+					input.upc,
+					input.imgUrl,
+					input.measurementTypeId,
+					updateFridgeItem.rows[0].fridgeItemInfoId,
+				]
+			);
+
+			if (updateFridgeItemInfo.rowCount !== 1) {
+				return {
+					errors: [
+						{
+							field: 'table: fridgeItemInfo',
+							message: 'error while updating the fridge item info',
+						},
+					],
+				};
+			}
+
+			return { success: true };
+		} catch (err) {
+			return {
+				errors: postGresError(err),
+			};
+		}
+	}
+
+	/**
 	 * Deletes all fridge items of a fridge
 	 * TODO: more testing needed
 	 *
