@@ -163,7 +163,7 @@ export class FridgeItemResolver {
 	@Mutation(() => BooleanResponse)
 	async updateFridgeItem(
 		@Arg('input') input: FridgeItemInput,
-		@Arg('fridgeId') fridgeId: Number
+		@Arg('fridgeItemId') fridgeItemId: Number
 	): Promise<BooleanResponse> {
 		try {
 			const updateFridgeItem = await client.query(
@@ -176,7 +176,7 @@ export class FridgeItemResolver {
 				WHERE "fridgeItems"."id" = $4
 				RETURNING *;
 				`,
-				[input.quantity, input.purchasedDate, input.expiryDate, fridgeId]
+				[input.quantity, input.purchasedDate, input.expiryDate, fridgeItemId]
 			);
 
 			if (updateFridgeItem.rowCount !== 1) {
