@@ -2,17 +2,19 @@ import 'reflect-metadata';
 import 'dotenv/config';
 import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
-import { UserResolver } from './resolvers/UserResolver';
+
 import { buildSchema } from 'type-graphql';
 import { createConnection } from 'typeorm';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import session from 'express-session';
+import { UserResolver } from './resolvers/UserResolver';
 import { FridgeResolver } from './resolvers/FridgeResolver';
 import { FridgeItemResolver } from './resolvers/FridgeItemResolver';
 import { FridgeUserTableResolver } from './resolvers/FridgeUserTableResolver';
-import { Client } from 'pg';
 import { MeasurementTypeResolver } from './resolvers/MeasurementTypeResolver';
+import { GroceryListResolver } from './resolvers/GroceryListResolver';
+import { Client } from 'pg';
 
 // declare a userId field in the session
 declare module 'express-session' {
@@ -121,6 +123,7 @@ export const client = new Client({
 				FridgeItemResolver,
 				FridgeUserTableResolver,
 				MeasurementTypeResolver,
+				GroceryListResolver,
 			],
 		}),
 		context: ({ req, res }) => ({
