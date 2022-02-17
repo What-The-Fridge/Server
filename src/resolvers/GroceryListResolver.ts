@@ -7,8 +7,11 @@ import {
 	// UseMiddleware,
 } from 'type-graphql';
 import { client } from '../index';
-import { GroceryListResponse } from '../utils/objectTypes/objectTypes';
-import { postGresError } from './helpers/sharedFunctions';
+import {
+	BooleanResponse,
+	GroceryListResponse,
+} from '../utils/objectTypes/objectTypes';
+import { deleteItemById, postGresError } from './helpers/sharedFunctions';
 
 @Resolver(GroceryList)
 export class GroceryListResolver {
@@ -80,5 +83,43 @@ export class GroceryListResolver {
 		}
 
 		return { groceryList };
+	}
+
+	/**
+	 * Deletes a grocery list
+	 *
+	 * @param groceryListId id of the grocery list
+	 * @return true/false based on whether deleted. Upon errors, return the array of all the errors
+	 */
+	@Mutation(() => BooleanResponse)
+	async deleteGroceryList(
+		@Arg('groceryListId') groceryListId: number
+	): Promise<BooleanResponse> {
+		try {
+			const clearGroceryList = await client.query(
+				`
+				DELETE FROM public."groceryItems" 
+				WHERE "groceryItems"."groceryListId"= $1;
+				`,
+				[groceryListId]
+			);
+
+			if (!clearGroceryList) {
+				return {
+					errors: [
+						{
+							field: 'groceryLists',
+							message: 'could not clear all the items of the grocery list',
+						},
+					],
+				};
+			}
+		} catch (err) {
+			return {
+				errors: postGresError(err),
+			};
+		}
+
+		return await deleteItemById(groceryListId, 'groceryLists');
 	}
 }

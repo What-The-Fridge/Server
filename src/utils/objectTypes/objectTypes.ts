@@ -179,6 +179,15 @@ export class FridgesResponse {
 }
 
 @ObjectType()
+export class GroceryListsResponse {
+	@Field(() => [FieldError], { nullable: true })
+	errors?: FieldError[];
+
+	@Field(() => [GroceryList], { nullable: true })
+	groceryLists?: GroceryList[];
+}
+
+@ObjectType()
 export class MeasurementTypesResponse {
 	@Field(() => [FieldError], { nullable: true })
 	errors?: FieldError[];
