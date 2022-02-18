@@ -15,6 +15,7 @@ import { FridgeUserTableResolver } from './resolvers/FridgeUserTableResolver';
 import { MeasurementTypeResolver } from './resolvers/MeasurementTypeResolver';
 import { GroceryListResolver } from './resolvers/GroceryListResolver';
 import { GroceryListUserTableResolver } from './resolvers/GroceryListUserTableResolver';
+import { GroceryItemResolver } from './resolvers/GroceryItemResolver';
 import { Client } from 'pg';
 
 // declare a userId field in the session
@@ -126,6 +127,7 @@ export const client = new Client({
 				MeasurementTypeResolver,
 				GroceryListResolver,
 				GroceryListUserTableResolver,
+				GroceryItemResolver,
 			],
 		}),
 		context: ({ req, res }) => ({

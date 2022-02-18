@@ -66,3 +66,10 @@ export class GroceryItem extends BaseEntity {
 	@CreateDateColumn({ type: 'timestamptz' })
 	createdAt: Date;
 }
+
+@ObjectType()
+export class detailedGroceryItem extends GroceryItem {
+	@Field(() => String)
+	@Column({ type: 'varchar' })
+	measurementUnit!: string;
+}
