@@ -1,14 +1,17 @@
-import { Arg, Mutation, Query, Resolver } from 'type-graphql';
+import { Arg, Ctx, Mutation, Query, Resolver } from 'type-graphql';
 import {
 	BooleanResponse,
 	DetailedGroceryItemResponse,
 	DetailedGroceryItemsResponse,
+	FridgeItemInput,
 	GroceryItemInput,
 	GroceryItemResponse,
 } from '../utils/objectTypes/objectTypes';
 import { client } from '../index';
 import { deleteItemById, postGresError } from './helpers/sharedFunctions';
 import { GroceryItem } from '../entities/GroceryItem';
+import { FridgeItemResolver } from './FridgeItemResolver';
+import { MyContext } from 'src/utils/context/MyContext';
 
 @Resolver(GroceryItem)
 export class GroceryItemResolver {
@@ -112,6 +115,36 @@ export class GroceryItemResolver {
 				errors: postGresError(err),
 			};
 		}
+	}
+
+	@Mutation(() => BooleanResponse)
+	async moveGroceryItemToFridge(
+		@Arg('input') input: FridgeItemInput,
+		@Arg('groceryItemId') groceryItemId: number,
+		@Ctx() { req, res, upc_user_constraint }: MyContext
+	): Promise<BooleanResponse> {
+		const createNewFridgeItem = await new FridgeItemResolver().createFridgeItem(
+			input,
+			{
+				req,
+				res,
+				upc_user_constraint,
+			}
+		);
+
+		if (createNewFridgeItem.errors) {
+			return {
+				success: false,
+				errors: [
+					{
+						field: 'table: fridgeItems',
+						message: 'error while creating fridge item',
+					},
+				],
+			};
+		}
+
+		return await deleteItemById(groceryItemId, 'groceryItems');
 	}
 
 	@Query(() => DetailedGroceryItemsResponse)
