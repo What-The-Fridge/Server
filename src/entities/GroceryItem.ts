@@ -68,7 +68,7 @@ export class GroceryItem extends BaseEntity {
 }
 
 @ObjectType()
-export class detailedGroceryItem extends GroceryItem {
+export class DetailedGroceryItem extends GroceryItem {
 	@Field(() => String)
 	@Column({ type: 'varchar' })
 	measurementUnit!: string;

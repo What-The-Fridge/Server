@@ -181,6 +181,7 @@ export class FridgeItemResolver {
 
 			if (updateFridgeItem.rowCount !== 1) {
 				return {
+					success: false,
 					errors: [
 						{
 							field: 'table: fridgeItems',
@@ -212,6 +213,7 @@ export class FridgeItemResolver {
 
 			if (updateFridgeItemInfo.rowCount !== 1) {
 				return {
+					success: false,
 					errors: [
 						{
 							field: 'table: fridgeItemInfo',
@@ -224,6 +226,7 @@ export class FridgeItemResolver {
 			return { success: true };
 		} catch (err) {
 			return {
+				success: false,
 				errors: postGresError(err),
 			};
 		}

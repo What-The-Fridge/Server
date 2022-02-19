@@ -1,9 +1,10 @@
 import { Arg, Mutation, Query, Resolver } from 'type-graphql';
 import {
 	BooleanResponse,
+	DetailedGroceryItemResponse,
+	DetailedGroceryItemsResponse,
 	GroceryItemInput,
 	GroceryItemResponse,
-	GroceryItemsResponse,
 } from '../utils/objectTypes/objectTypes';
 import { client } from '../index';
 import { deleteItemById, postGresError } from './helpers/sharedFunctions';
@@ -64,10 +65,59 @@ export class GroceryItemResolver {
 		return await deleteItemById(groceryItemId, 'groceryItems');
 	}
 
-	@Query(() => GroceryItemsResponse)
+	@Mutation(() => BooleanResponse)
+	async updateGroceryItem(
+		@Arg('input') input: GroceryItemInput,
+		@Arg('groceryItemId') groceryItemId: Number
+	): Promise<BooleanResponse> {
+		try {
+			const updateGroceryItemInfo = await client.query(
+				`
+				UPDATE public."groceryItems"
+				SET 
+					name = $1,
+					upc = $2,
+					"imgUrl" = $3,
+          quantity = $4,
+					"measurementTypeId" = $5
+				WHERE "groceryItems"."id" = $6
+				RETURNING *;
+				`,
+				[
+					input.name,
+					input.upc,
+					input.imgUrl,
+					input.quantity,
+					input.measurementTypeId,
+					groceryItemId,
+				]
+			);
+
+			if (updateGroceryItemInfo.rowCount !== 1) {
+				return {
+					success: false,
+					errors: [
+						{
+							field: 'table: groceryItems',
+							message: 'error while updating the grocery item',
+						},
+					],
+				};
+			}
+
+			return { success: true };
+		} catch (err) {
+			return {
+				success: false,
+				errors: postGresError(err),
+			};
+		}
+	}
+
+	@Query(() => DetailedGroceryItemsResponse)
 	async getGroceryListGroceryItems(
 		@Arg('groceryListId') groceryListId: number
-	): Promise<GroceryItemsResponse> {
+	): Promise<DetailedGroceryItemsResponse> {
 		try {
 			let groceryItems;
 			const result = await client.query(
@@ -82,7 +132,6 @@ export class GroceryItemResolver {
 
 			groceryItems = result.rows;
 
-			console.log(groceryItems);
 			if (groceryItems) {
 				return { groceryItems: groceryItems };
 			}
@@ -100,5 +149,52 @@ export class GroceryItemResolver {
 				errors: postGresError(err),
 			};
 		}
+	}
+
+	@Query(() => DetailedGroceryItemResponse)
+	async getGroceryItemById(
+		@Arg('id') id: number
+	): Promise<DetailedGroceryItemResponse> {
+		let detailedGroceryItem;
+		try {
+			const getGroceryItem = await client.query(
+				`
+				SELECT "groceryItems".*, measurement_type."measurementUnit"
+        FROM public."groceryItems"
+        FULL OUTER JOIN public.measurement_type ON "groceryItems"."measurementTypeId" = measurement_type."id"
+        WHERE "groceryItems"."id" = $1;
+				`,
+				[id]
+			);
+
+			if (getGroceryItem == undefined) {
+				return {
+					errors: [
+						{
+							field: 'table: groceryItems',
+							message: 'database returned undefined',
+						},
+					],
+				};
+			}
+
+			if (getGroceryItem.rows[0] == null) {
+				return {
+					errors: [
+						{
+							field: 'table: groceryItems',
+							message: 'cannot find such item',
+						},
+					],
+				};
+			}
+
+			detailedGroceryItem = getGroceryItem.rows[0];
+		} catch (err) {
+			return {
+				errors: postGresError(err),
+			};
+		}
+		return { detailedGroceryItem };
 	}
 }

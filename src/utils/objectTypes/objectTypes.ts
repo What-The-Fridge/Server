@@ -6,7 +6,7 @@ import { DetailedFridgeItem } from '../../entities/FridgeItem';
 import { FridgeItemInfo } from '../../entities/FridgeItemInfo';
 import { MeasurementType } from '../../entities/MeasurementType';
 import { GroceryList } from '../../entities/GroceryList';
-import { detailedGroceryItem, GroceryItem } from '../../entities/GroceryItem';
+import { DetailedGroceryItem, GroceryItem } from '../../entities/GroceryItem';
 
 @InputType()
 export class UserInput {
@@ -184,6 +184,14 @@ export class GroceryItemResponse {
 	@Field(() => GroceryItem, { nullable: true })
 	groceryItem?: GroceryItem;
 }
+@ObjectType()
+export class DetailedGroceryItemResponse {
+	@Field(() => [FieldError], { nullable: true })
+	errors?: FieldError[];
+
+	@Field(() => DetailedGroceryItem, { nullable: true })
+	detailedGroceryItem?: DetailedGroceryItem;
+}
 
 @ObjectType()
 export class UsersResponse {
@@ -231,12 +239,12 @@ export class MeasurementTypesResponse {
 }
 
 @ObjectType()
-export class GroceryItemsResponse {
+export class DetailedGroceryItemsResponse {
 	@Field(() => [FieldError], { nullable: true })
 	errors?: FieldError[];
 
-	@Field(() => [detailedGroceryItem], { nullable: true })
-	groceryItems?: detailedGroceryItem[];
+	@Field(() => [DetailedGroceryItem], { nullable: true })
+	groceryItems?: DetailedGroceryItem[];
 }
 
 @ObjectType()
