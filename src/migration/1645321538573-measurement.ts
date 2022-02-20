@@ -8,9 +8,9 @@ export class measurement1645321538573 implements MigrationInterface {
             insert into measurement_type (id, measurement, "measurementUnit") values (3, 'Onces', 'oz');
             insert into measurement_type (id, measurement, "measurementUnit") values (4, 'Pound', 'lb');
             insert into measurement_type (id, measurement, "measurementUnit") values (5, 'Liters', 'L');
-            insert into measurement_type (id, measurement, "measurementUnit") values (6, 'Cups', 'c');
+            insert into measurement_type (id, measurement, "measurementUnit") values (6, 'Cups', 'cups');
             insert into measurement_type (id, measurement, "measurementUnit") values (7, 'Gallon', 'gal');
-            insert into measurement_type (id, measurement, "measurementUnit") values (8, 'Units', 'Unit');
+            insert into measurement_type (id, measurement, "measurementUnit") values (8, 'Units', 'units');
         `);
 	}
 
@@ -24,6 +24,7 @@ export class measurement1645321538573 implements MigrationInterface {
             delete from measurement_type where id = 6;
             delete from measurement_type where id = 7;
             delete from measurement_type where id = 8;
+            delete from measurement_type where id = 9;
         `);
 	}
 }

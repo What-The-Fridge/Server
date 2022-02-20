@@ -29,3 +29,4 @@ yarn-error.log*
 # keys
 .env
 serviceAccountKey.json
+ormconfig.json

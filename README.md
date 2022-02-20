@@ -7,24 +7,17 @@
 NodeJS latest v
 Install and run PostgreSQL
 
+**Environment Variables (ask me)**
+
+- .env file
+- ormconfig.json
+- serviceAccountKey.json
+
 **Local DB config**
 
 - Install and run PostgreSQL
 - Create a db called 'what-the-fridge' without quotation marks
-- username: postgres &
-  password: postgres
-
-**Environment Variables**
-
-Create a .env file in ./backend/Node folder, ask Hachi for keys:
-
-```sh
-ACCESS_TOKEN_SECRET = 
-REFRESH_TOKEN_SECRET = 
-SESSION_SECRET = 
-XAPPID = 
-XAPPKEY = 
-```
+- create a user: username & password - can be found in .env file
 
 **Install**
 

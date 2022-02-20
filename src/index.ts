@@ -6,7 +6,6 @@ import { buildSchema } from 'type-graphql';
 import { createConnection } from 'typeorm';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import session from 'express-session';
 import { UserResolver } from './resolvers/UserResolver';
 import { FridgeResolver } from './resolvers/FridgeResolver';
 import { FridgeItemResolver } from './resolvers/FridgeItemResolver';
@@ -41,18 +40,17 @@ export var admin = require('firebase-admin');
 // used to run sql queries to the db
 export const client = new Client({
 	host: 'localhost',
-	user: 'postgres',
-	password: 'postgres',
-	database: 'what-the-fridge',
+	user: process.env.PG_USERNAME,
+	password: process.env.PG_PASSWORD,
+	database: process.env.PG_DB,
 });
 
 (async () => {
 	const conn = await createConnection({
-		name: 'typeOrmConnection',
 		type: 'postgres',
-		database: 'what-the-fridge',
-		username: 'postgres',
-		password: 'postgres',
+		database: process.env.PG_DB,
+		username: process.env.PG_USERNAME,
+		password: process.env.PG_PASSWORD,
 		logging: true,
 		synchronize: true,
 		migrations: [path.join(__dirname + '/migration/*.ts')],
@@ -106,41 +104,6 @@ export const client = new Client({
 	// enable this if you run behind a proxy (e.g. nginx)
 	app.set('trust proxy', 1);
 
-	// // redis store session
-	// const RedisStore = connectRedis(session);
-	// //Configure redis client
-	// const redisClient = redis.createClient({
-	// 	host: 'localhost',
-	// 	port: 6379,
-	// });
-
-	// redisClient.on('error', function (err) {
-	// 	console.log('Could not establish a connection with redis. ' + err);
-	// });
-	// redisClient.on('connect', function () {
-	// 	console.log('Connected to redis successfully');
-	// });
-
-	app.use(
-		session({
-			name: 'qid',
-			// store: new RedisStore({
-			// 	client: redisClient,
-			// 	disableTTL: true,
-			// 	disableTouch: true,
-			// }),
-			cookie: {
-				maxAge: 1000 * 60 * 60 * 24,
-				httpOnly: true,
-				sameSite: 'lax',
-				secure: false, // works for both http and https, need to change on __PROD__
-			},
-			secret: process.env.SESSION_SECRET!,
-			resave: false,
-			saveUninitialized: false,
-		})
-	);
-
 	const constraints = await client.query(
 		`
 		SELECT conname
@@ -178,7 +141,7 @@ export const client = new Client({
 	await apolloServer.start();
 	apolloServer.applyMiddleware({ app, cors: false });
 
-	app.listen(4000, () => {
-		console.log('express listening on port 4000');
+	app.listen(process.env.PORT_NUM, () => {
+		console.log(`express listening on port ${process.env.PORT_NUM}`);
 	});
 })();
