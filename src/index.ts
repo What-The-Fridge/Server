@@ -39,21 +39,16 @@ export var admin = require('firebase-admin');
 
 // used to run sql queries to the db
 export const client = new Client({
-	host: 'localhost',
-	user: process.env.PG_USERNAME,
-	password: process.env.PG_PASSWORD,
-	database: process.env.PG_DB,
+	connectionString: process.env.PG_CONNECTION_URL,
 });
 
 (async () => {
 	const conn = await createConnection({
 		type: 'postgres',
-		database: process.env.PG_DB,
-		username: process.env.PG_USERNAME,
-		password: process.env.PG_PASSWORD,
+		url: process.env.PG_CONNECTION_URL,
 		logging: true,
 		synchronize: true,
-		migrations: [path.join(__dirname + '/migration/*.ts')],
+		migrations: [path.join(__dirname + '/migration/*')],
 		entities: [
 			Fridge,
 			FridgeItem,
@@ -93,7 +88,10 @@ export const client = new Client({
 	app.use(cookieParser());
 
 	// cors
-	var whitelist = ['http://localhost:3000', 'https://studio.apollographql.com'];
+	var whitelist = [
+		process.env.CORS_ORIGIN!,
+		'https://studio.apollographql.com',
+	];
 	app.use(
 		cors({
 			origin: whitelist,

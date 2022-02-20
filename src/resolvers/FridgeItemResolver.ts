@@ -15,7 +15,7 @@ import {
 	fetchItemInfoByUPC,
 } from './helpers/fridgeItemHelper';
 import { MyContext } from 'src/utils/context/MyContext';
-import { fridgeUserLinkExists } from './helpers/FridgeUserTableHelper';
+import { fridgeUserLinkExists } from './helpers/fridgeUserTableHelper';
 import { getMeasurementTypeById } from './helpers/measurementTypeHelper';
 import { clearFridgeItems } from './helpers/fridgeHelper';
 
