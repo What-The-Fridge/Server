@@ -2,7 +2,6 @@ import 'reflect-metadata';
 import 'dotenv/config';
 import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
-
 import { buildSchema } from 'type-graphql';
 import { createConnection } from 'typeorm';
 import cookieParser from 'cookie-parser';
@@ -17,6 +16,16 @@ import { GroceryListResolver } from './resolvers/GroceryListResolver';
 import { GroceryListUserTableResolver } from './resolvers/GroceryListUserTableResolver';
 import { GroceryItemResolver } from './resolvers/GroceryItemResolver';
 import { Client } from 'pg';
+import { FridgeUserTable } from './entities/FridgeUserTable';
+import { GroceryItem } from './entities/GroceryItem';
+import { GroceryList } from './entities/GroceryList';
+import { GroceryListUserTable } from './entities/GroceryListUserTable';
+import { MeasurementType } from './entities/MeasurementType';
+import { User } from './entities/User';
+import { FridgeItemInfo } from './entities/FridgeItemInfo';
+import { FridgeItem } from './entities/FridgeItem';
+import { Fridge } from './entities/Fridge';
+import path from 'path';
 
 // declare a userId field in the session
 declare module 'express-session' {
@@ -29,6 +38,7 @@ declare module 'express-session' {
 
 export var admin = require('firebase-admin');
 
+// used to run sql queries to the db
 export const client = new Client({
 	host: 'localhost',
 	user: 'postgres',
@@ -37,6 +47,33 @@ export const client = new Client({
 });
 
 (async () => {
+	const conn = await createConnection({
+		name: 'typeOrmConnection',
+		type: 'postgres',
+		database: 'what-the-fridge',
+		username: 'postgres',
+		password: 'postgres',
+		logging: true,
+		synchronize: true,
+		migrations: [path.join(__dirname + '/migration/*.ts')],
+		entities: [
+			Fridge,
+			FridgeItem,
+			FridgeItemInfo,
+			FridgeUserTable,
+			GroceryItem,
+			GroceryList,
+			GroceryListUserTable,
+			MeasurementType,
+			User,
+		],
+	});
+
+	// measurement migration
+	conn.undoLastMigration().then(() => {
+		conn.runMigrations();
+	});
+
 	const app = express();
 
 	// firebase authentication
@@ -116,7 +153,6 @@ export const client = new Client({
 		`
 	);
 
-	await createConnection();
 	const apolloServer = new ApolloServer({
 		schema: await buildSchema({
 			resolvers: [

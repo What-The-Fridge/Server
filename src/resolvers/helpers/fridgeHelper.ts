@@ -19,7 +19,8 @@ export async function clearFridgeItems(
 		});
 
 		// delete all the entries from the fridgeItems table
-		const deleteFridgeItems = await client.query(
+		// TODO: check the result of this
+		await client.query(
 			`
       DELETE FROM public."fridgeItems" WHERE "fridgeItems"."fridgeId"=$1;
     `,
@@ -35,8 +36,6 @@ export async function clearFridgeItems(
 				[element]
 			);
 		});
-
-		console.log(deleteFridgeItems);
 
 		return { success: true };
 	} catch (err) {
