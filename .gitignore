@@ -13,6 +13,7 @@ private-google.json
 /coverage
 
 # production
+deploy.sh
 /build
 /dist
 

@@ -4,7 +4,6 @@ import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
 import { createConnection } from 'typeorm';
-import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { UserResolver } from './resolvers/UserResolver';
 import { FridgeResolver } from './resolvers/FridgeResolver';
@@ -43,6 +42,26 @@ export const client = new Client({
 });
 
 (async () => {
+	const app = express();
+
+	// enable this if you run behind a proxy (e.g. nginx)
+	app.set('trust proxy', 1);
+
+	cors;
+	var whitelist = [
+		process.env.CORS_ORIGIN!,
+		'https://studio.apollographql.com',
+		'local://localhost:3000',
+	];
+
+	app.use(
+		cors({
+			origin: whitelist,
+			credentials: true,
+			methods: ['GET', 'POST'],
+		})
+	);
+
 	const conn = await createConnection({
 		type: 'postgres',
 		url: process.env.PG_CONNECTION_URL,
@@ -67,8 +86,6 @@ export const client = new Client({
 		conn.runMigrations();
 	});
 
-	const app = express();
-
 	// firebase authentication
 	var serviceAccount = require('../serviceAccountKey.json');
 
@@ -84,23 +101,6 @@ export const client = new Client({
 			console.log('connected to what-the-fridge postgres server');
 		}
 	});
-
-	app.use(cookieParser());
-
-	// cors
-	var whitelist = [
-		process.env.CORS_ORIGIN!,
-		'https://studio.apollographql.com',
-	];
-	app.use(
-		cors({
-			origin: whitelist,
-			credentials: true,
-		})
-	);
-
-	// enable this if you run behind a proxy (e.g. nginx)
-	app.set('trust proxy', 1);
 
 	const constraints = await client.query(
 		`
@@ -141,5 +141,9 @@ export const client = new Client({
 
 	app.listen(process.env.PORT_NUM, () => {
 		console.log(`express listening on port ${process.env.PORT_NUM}`);
+	});
+
+	app.use('/', (_, res) => {
+		return res.send('Welcome to What The Fridge api');
 	});
 })();
