@@ -50,11 +50,7 @@ export const client = new Client({
 	// cors;
 	var whitelist;
 	if ((process.env.PROD as string) !== 'true') {
-		whitelist = [
-			process.env.CORS_ORIGIN!,
-			'https://studio.apollographql.com',
-			'local://localhost:3000',
-		];
+		whitelist = ['https://studio.apollographql.com', 'local://localhost:3000'];
 	} else {
 		whitelist = process.env.CORS_ORIGIN!;
 	}
@@ -147,13 +143,6 @@ export const client = new Client({
 	app.listen(process.env.PORT_NUM, () => {
 		console.log(`express listening on port ${process.env.PORT_NUM}`);
 	});
-
-	// app.use((_, res, next) => {
-	// 	res.header('Access-Control-Allow-Origin', '*');
-	// 	res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-	// 	res.header('Access-Control-Allow-Headers', 'Content-Type');
-	// 	next();
-	// });
 
 	app.use('/', (_, res) => {
 		return res.send('Welcome to What The Fridge api');
