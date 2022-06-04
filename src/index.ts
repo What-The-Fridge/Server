@@ -140,8 +140,8 @@ export const client = new Client({
 	await apolloServer.start();
 	apolloServer.applyMiddleware({ app, cors: false });
 
-	app.listen(process.env.PORT_NUM, () => {
-		console.log(`express listening on port ${process.env.PORT_NUM}`);
+	app.listen(process.env.PORT || 4000, () => {
+		console.log(`express listening on port ${process.env.PORT || 4000}`);
 	});
 
 	app.use('/', (_, res) => {
