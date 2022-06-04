@@ -88,7 +88,7 @@ export const client = new Client({
 	});
 
 	// firebase authentication
-	var serviceAccount = require('../serviceAccountKey.json');
+	var serviceAccount = require('../fakeServiceAccountKey.json');
 
 	admin.initializeApp({
 		credential: admin.credential.cert(serviceAccount),
