@@ -34,7 +34,7 @@ declare module 'express-session' {
 	}
 }
 
-export var admin = require('firebase-admin');
+// export var admin = require('firebase-admin');
 
 // used to run sql queries to the db
 export const client = new Client({
@@ -88,11 +88,11 @@ export const client = new Client({
 	});
 
 	// firebase authentication
-	var serviceAccount = require('../fakeServiceAccountKey.json');
+	// var serviceAccount = require('../fakeServiceAccountKey.json');
 
-	admin.initializeApp({
-		credential: admin.credential.cert(serviceAccount),
-	});
+	// admin.initializeApp({
+	// 	credential: admin.credential.cert(serviceAccount),
+	// });
 
 	// postgres db
 	client.connect((err: any) => {
