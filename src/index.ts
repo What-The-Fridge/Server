@@ -38,7 +38,7 @@ export var admin = require('firebase-admin');
 
 // used to run sql queries to the db
 export const client = new Client({
-	connectionString: process.env.PG_CONNECTION_URL,
+	connectionString: process.env.DATABASE_URL,
 });
 
 (async () => {
@@ -65,7 +65,7 @@ export const client = new Client({
 
 	const conn = await createConnection({
 		type: 'postgres',
-		url: process.env.PG_CONNECTION_URL,
+		url: process.env.DATABASE_URL,
 		logging: true,
 		synchronize: true,
 		migrations: [path.join(__dirname + '/migration/*')],
